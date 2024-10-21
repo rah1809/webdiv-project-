@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Gallery</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            grid-gap: 10px;
+            max-width: 1000px;
+            margin: 20px auto;
+        }
+
+        .gallery img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .gallery img:hover {
+            transform: scale(1.05);
+        }
+
+        .gallery a {
+            display: block;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .gallery a:hover {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+
+<div class="gallery">
+    <a href="image1-large.jpg" target="_blank">
+        <img src="image1.jpg" alt="Image 1">
+    </a>
+    <a href="image2-large.jpg" target="_blank">
+        <img src="image2.jpg" alt="Image 2">
+    </a>
+    <a href="image3-large.jpg" target="_blank">
+        <img src="image3.jpg" alt="Image 3">
+    </a>
+    <a href="image4-large.jpg" target="_blank">
+        <img src="image4.jpg" alt="Image 4">
+    </a>
+    <!-- Add more images as needed -->
+</div>
+
+</body>
+</html>
