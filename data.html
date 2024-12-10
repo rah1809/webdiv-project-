@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Analysis</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <!-- Navigation Menu -->
+  <nav>
+    <ul class="menu">
+      <li><a href="login.html">Login Page</a></li>
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="research-profile.html">Research Profile</a></li>
+      <li><a href="group-research.html">Group Research</a></li>
+      <li><a href="project-management.html">Project Management</a></li>
+      <li><a href="library.html">Library</a></li>
+      <li><a href="data-analysis.html" class="active">Data Analysis</a></li>
+      <li><a href="collaboration.html">Collaboration</a></li>
+    </ul>
+  </nav>
+
+  <!-- Data Analysis Section -->
+  <header>
+    <h1>Data Analysis</h1>
+  </header>
+  <main>
+    <!-- Upload Section -->
+    <section id="upload-data">
+      <h2>Upload Dataset</h2>
+      <input type="file" id="file-input" accept=".csv">
+      <button id="upload-button">Upload</button>
+    </section>
+
+    <!-- Data Table Section -->
+    <section id="data-table">
+      <h2>Data Preview</h2>
+      <table id="data-table-view">
+        <!-- Table content populated dynamically -->
+      </table>
+    </section>
+
+    <!-- Chart Section -->
+    <section id="data-visualization">
+      <h2>Data Visualization</h2>
+      <canvas id="data-chart"></canvas>
+    </section>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>

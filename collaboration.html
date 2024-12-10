@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Collaboration</title>
+  <link rel="stylesheet" href="collab.css">
+</head>
+<body>
+  <!-- Navigation Menu -->
+  <nav>
+    <ul class="menu">
+      <li><a href="login.html">Login Page</a></li>
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="research-profile.html">Research Profile</a></li>
+      <li><a href="group-research.html">Group Research</a></li>
+      <li><a href="project-management.html">Project Management</a></li>
+      <li><a href="library.html">Library</a></li>
+      <li><a href="data-analysis.html">Data Analysis</a></li>
+      <li><a href="collaboration.html" class="active">Collaboration</a></li>
+    </ul>
+  </nav>
+
+  <!-- Collaboration Section -->
+  <header>
+    <h1>Collaboration</h1>
+  </header>
+  <main>
+    <!-- Chat Section -->
+    <section id="chat-box">
+      <h2>Group Chat</h2>
+      <div id="chat-messages">
+        <!-- Messages will be dynamically added here -->
+      </div>
+      <form id="chat-form">
+        <input type="text" id="chat-input" placeholder="Type your message..." required>
+        <button type="submit">Send</button>
+      </form>
+    </section>
+
+    <!-- User List Section -->
+    <section id="user-list">
+      <h2>Online Researchers</h2>
+      <ul id="online-users">
+        <!-- Dynamic list of users -->
+      </ul>
+    </section>
+  </main>
+  <script src="collab.js"></script>
+</body>
+</html>
