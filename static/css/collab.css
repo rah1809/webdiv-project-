@@ -1,0 +1,51 @@
+/* Collaboration Page Styles */
+#chat-box {
+  margin: 20px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+#chat-messages {
+  height: 300px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  background-color: white;
+}
+
+#chat-form {
+  display: flex;
+  gap: 10px;
+}
+
+#chat-input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+#user-list {
+  margin: 20px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+#online-users {
+  list-style: none;
+  padding: 0;
+}
+
+#online-users li {
+  padding: 5px;
+  border-bottom: 1px solid #ddd;
+}
+
+#online-users li:last-child {
+  border-bottom: none;
+}

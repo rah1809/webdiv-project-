@@ -1,0 +1,49 @@
+/* styles.css */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+  }
+  
+  header {
+    background-color: #3e8e41;
+    color: white;
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .dashboard {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px;
+  }
+  
+  .box {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 20px;
+    width: 45%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .box h2 {
+    margin-top: 0;
+  }
+  
+  #project-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  #project-list li {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  #project-list li:hover {
+    background-color: #f9f9f9;
+    cursor: pointer;
+  }
+  

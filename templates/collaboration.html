@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Collaboration{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/collab.css') }}>
+{% endblock %}
+
+{% block nav_title %}login{% endblock %}
+
+{% block content %}
+<header>
+  <h1>Collaboration</h1>
+</header>
+<main>
+  <!-- Chat Section -->
+  <section id="chat-box">
+    <h2>Group Chat</h2>
+    <div id="chat-messages">
+      <!-- Messages will be dynamically added here -->
+    </div>
+    <form id="chat-form">
+      <input type="text" id="chat-input" placeholder="Type your message..." required>
+      <button type="submit">Send</button>
+    </form>
+  </section>
+
+  <!-- User List Section -->
+  <section id="user-list">
+    <h2>Online Researchers</h2>
+    <ul id="online-users">
+      <!-- Dynamic list of users -->
+    </ul>
+  </section>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/collab.js"></script>
+{% endblock %}

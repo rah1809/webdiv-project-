@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Group Research</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/gr.css') }}">
+</head>
+<body>
+  <!-- Navigation Menu -->
+  <nav>
+    <ul class="menu">
+      <li><a href="login.html">Login Page</a></li>
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="research-profile.html">Research Profile</a></li>
+      <li><a href="group-research.html" class="active">Group Research</a></li>
+      <li><a href="project-management.html">Project Management</a></li>
+      <li><a href="library.html">Library</a></li>
+      <li><a href="data-analysis.html">Data Analysis</a></li>
+      <li><a href="collaboration.html">Collaboration</a></li>
+    </ul>
+  </nav>
+
+  <!-- Group Research Section -->
+  <header>
+    <h1>Group Research</h1>
+  </header>
+  <main>
+    <!-- Collaborative Tools -->
+    <section id="group-collaboration">
+      <h2>Group Projects</h2>
+      <ul id="group-projects">
+        <!-- Group project items will appear here dynamically -->
+      </ul>
+    </section>
+
+    <section id="discussion-section">
+      <h2>Discussions</h2>
+      <div id="discussion-box">
+        <div id="messages">
+          <!-- Messages will be dynamically rendered here -->
+        </div>
+        <form id="message-form">
+          <input type="text" id="message-input" placeholder="Type your message" required>
+          <button type="submit">Send</button>
+        </form>
+      </div>
+    </section>
+
+    <section id="document-section">
+      <h2>Document Sharing</h2>
+      <form id="document-form">
+        <input type="file" id="file-upload" accept=".pdf, .docx, .pptx" required>
+        <button type="submit">Upload</button>
+      </form>
+      <div id="documents">
+        <!-- Uploaded document links will appear here -->
+      </div>
+    </section>
+  </main>
+  <script src="C:\Users\user\OneDrive\Desktop\bruce li\static\js\gr.js"></script>
+</body>
+</html>

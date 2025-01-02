@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Comedy Workspace</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Sliding Menu -->
+    <div id="menu" class="menu">
+        <button class="close-btn" onclick="toggleMenu()">✖</button>
+        <ul>
+            <li><a href="/dashboard">🏠 Dashboard</a></li>
+            <li><a href="/research-profile">🔬 Research Profile</a></li>
+            <li><a href="/project-management">🛠 Project Management</a></li>
+            <li><a href="/library">📚 Library</a></li>
+            <li><a href="/group-research">👥 Group Research</a></li>
+            <li><a href="/data-analysis">📊 Data Analysis</a></li>
+            <li><a href="/collaboration">🤝 Collaboration</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div id="main">
+        <button class="menu-btn" onclick="toggleMenu()">☰ Menu</button>
+        <div class="login-container">
+            <div class="login-header">
+                <h1>🎭 Welcome, Comedy Genius!</h1>
+                <p>Login to your realm of hilarious productivity.</p>
+            </div>
+            <form id="login-form">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Enter your funny username" required>
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter your secure password" required>
+                <button type="submit">🚀 Login</button>
+                <p id="errorMessage"></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Floating Chat Button -->
+    <button id="chat-btn" class="chat-btn" onclick="toggleChat()">💬</button>
+
+    <!-- Chat Box -->
+    <div id="chat-box" class="chat-box">
+        <div class="chat-header">
+            <span>Chat</span>
+            <button onclick="toggleChat()">✖</button>
+        </div>
+        <div class="chat-body" id="chat-body">
+            <p class="chat-message">Welcome to the chat! 🎉</p>
+        </div>
+        <div class="chat-footer">
+            <input type="text" id="chat-input" placeholder="Type a message...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>

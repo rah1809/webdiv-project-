@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Library</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/lib.css') }}">
+</head>
+<body>
+  <!-- Navigation Menu -->
+  <nav>
+    <ul class="menu">
+      <li><a href="login.html">Login Page</a></li>
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="research-profile.html">Research Profile</a></li>
+      <li><a href="group-research.html">Group Research</a></li>
+      <li><a href="project-management.html">Project Management</a></li>
+      <li><a href="library.html" class="active">Library</a></li>
+      <li><a href="data-analysis.html">Data Analysis</a></li>
+      <li><a href="collaboration.html">Collaboration</a></li>
+    </ul>
+  </nav>
+
+  <!-- Library Section -->
+  <header>
+    <h1>Library</h1>
+  </header>
+  <main>
+    <!-- Search Section -->
+    <section id="search-bar">
+      <input type="text" id="search-input" placeholder="Search resources by title or author...">
+    </section>
+
+    <!-- Resource List -->
+    <section id="resource-list">
+      <h2>Available Resources</h2>
+      <ul id="library-items">
+        <!-- Dynamic resources will be populated here -->
+      </ul>
+    </section>
+
+    <!-- Add New Resource -->
+    <section id="add-resource">
+      <h2>Add a New Resource</h2>
+      <form id="add-resource-form">
+        <div class="form-group">
+          <label for="resource-title">Resource Title:</label>
+          <input type="text" id="resource-title" name="title" placeholder="Enter resource title" required>
+        </div>
+        <div class="form-group">
+          <label for="resource-author">Author:</label>
+          <input type="text" id="resource-author" name="author" placeholder="Enter author name" required>
+        </div>
+        <div class="form-group">
+          <label for="resource-file">Upload File:</label>
+          <input type="file" id="resource-file" name="file">
+        </div>
+        <div class="form-group">
+          <label for="resource-description">Description:</label>
+          <textarea id="resource-description" name="description" placeholder="Enter a brief description" required></textarea>
+        </div>
+        <button type="submit">Add Resource</button>
+      </form>
+    </section>
+  </main>
+  <script src="C:\Users\user\OneDrive\Desktop\bruce li\static\js\lib.js"></script>
+</body>
+</html>
