@@ -1,10 +1,13 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for, session, flash
+from db import Database
+import os
 
 app = Flask(__name__,
             template_folder='templates',
-                static_folder='static')
+            static_folder='static')
+app.secret_key = os.urandom(24)  # Required for session management
+db = Database()
 
-# Routes for different pages
 @app.route('/')
 def dashboard():
     return render_template('dashboard.html')
@@ -29,9 +32,39 @@ def group_research():
 def library():
     return render_template('library.html')
 
-@app.route('/login.html')
+@app.route('/login')
 def login():
     return render_template('login.html')
+
+@app.route('/login_post', methods=['GET', 'POST'])
+def login_post():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        
+        if db.verify_user(username, password):
+            session['username'] = username
+            return redirect(url_for('dashboard'))
+        else:
+            flash('Invalid username or password')
+            return redirect(url_for('login'))
+    
+    return render_template('login.html')
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        
+        if db.add_user(username, password):
+            flash('Registration successful! Please login.')
+            return redirect(url_for('login'))
+        else:
+            flash('Username already exists')
+            return redirect(url_for('register'))
+    
+    return render_template('register.html')
 
 @app.route('/project-management.html')
 def project_management():
@@ -49,5 +82,5 @@ def tlogin():
 def tlog():
     return render_template('tlog.html')
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True)
