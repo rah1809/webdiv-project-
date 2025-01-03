@@ -56,8 +56,17 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        email = request.form.get('email')  # Optional field
+        full_name = request.form.get('full_name')  # Optional field
         
-        if db.add_user(username, password):
+        success, message = db.add_user(
+            username=username,
+            password=password,
+            email=email,
+            full_name=full_name
+        )
+        
+        if success:
             flash('Registration successful! Please login.')
             return redirect(url_for('login'))
         else:
