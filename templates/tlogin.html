@@ -27,13 +27,20 @@
         <div class="login-container">
             <h1>🎭 Welcome, Comedy Genius!</h1>
             <p>Login to unlock the realm of hilarious productivity.</p>
-            <form id="login-form">
+            <form id="login-form" method="POST" action="{{ url_for('tlogin_post') }}">
                 <label for="username">😂 Username</label>
-                <input type="text" id="username" placeholder="Enter your funny username" required>
+                <input type="text" id="username" name="username" placeholder="Enter your funny username" required>
                 <label for="password">🔒 Password</label>
-                <input type="password" id="password" placeholder="Enter your secure password" required>
+                <input type="password" id="password" name="password" placeholder="Enter your secure password" required>
                 <button type="submit">🚀 Login</button>
             </form>
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="flash-message">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
         </div>
     </div>
 

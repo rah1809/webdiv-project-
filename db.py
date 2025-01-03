@@ -112,3 +112,12 @@ class Database:
     def user_exists(self, username):
         """Check if username exists"""
         return self.login_collection.find_one({'username': username}) is not None
+
+    def get_online_users(self):
+        """Get list of currently online users"""
+        try:
+            online_users = list(self.db['OnlineUsers'].find({}, {'username': 1, '_id': 0}))
+            return [user['username'] for user in online_users]
+        except:
+            return []
+

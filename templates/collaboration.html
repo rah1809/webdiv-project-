@@ -3,7 +3,7 @@
 {% block title %}Collaboration{% endblock %}
 
 {% block styles %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/collab.css') }}>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/collab.css') }}">
 {% endblock %}
 
 {% block nav_title %}login{% endblock %}
@@ -29,7 +29,9 @@
   <section id="user-list">
     <h2>Online Researchers</h2>
     <ul id="online-users">
-      <!-- Dynamic list of users -->
+      {% for user in online_users %}
+        <li>{{ user }}</li>
+      {% endfor %}
     </ul>
   </section>
 </main>

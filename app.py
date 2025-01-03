@@ -14,7 +14,8 @@ def dashboard():
 
 @app.route('/collaboration.html')
 def collaboration():
-    return render_template('collaboration_template.html')
+    online_users = db.get_online_users()
+    return render_template('collaboration.html', online_users=online_users)
 
 @app.route('/data-analysis.html')
 def data_analysis():
@@ -90,6 +91,21 @@ def tlogin():
 @app.route('/tlog.html')
 def tlog():
     return render_template('tlog.html')
+
+@app.route('/tlogin_post', methods=['GET', 'POST'])
+def tlogin_post():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        
+        if db.verify_user(username, password):
+            session['username'] = username
+            return redirect(url_for('dashboard'))
+        else:
+            flash('Invalid username or password')
+            return redirect(url_for('tlogin'))
+    
+    return render_template('tlogin.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
