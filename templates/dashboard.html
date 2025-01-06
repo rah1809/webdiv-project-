@@ -1,45 +1,40 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}>
-</head>
-<body>
-  <!-- Navigation Menu -->
-  <nav>
-    <ul class="menu">
-      <li><a href="login.html">Login Page</a></li>
-      <li><a href="dashboard.html" class="active">Dashboard</a></li>
-      <li><a href="research-profile.html">Research Profile</a></li>
-      <li><a href="group-research.html">Group Research</a></li>
-      <li><a href="project-management.html">Project Management</a></li>
-      <li><a href="library.html">Library</a></li>
-      <li><a href="data-analysis.html">Data Analysis</a></li>
-      <li><a href="collaboration.html">Collaboration</a></li>
-    </ul>
-  </nav>
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard-container">
+    {% if user_data %}
+    <div class="welcome-section">
+        <h2>Welcome, {{ user_data.full_name or user_data.username }}!</h2>
+    </div>
+    {% endif %}
 
-  <!-- Dashboard Section -->
-  <header>
-    <h1>Welcome to Research Assistance</h1>
-  </header>
-  <main>
-    <section id="current-research">
-      <h2>Current Research Project</h2>
-      <div class="box">
-        <p id="current-project">No project selected</p>
+    {% if analyses %}
+    <div class="analyses-section">
+        <h3>Your Recent Analyses</h3>
+        <div class="analyses-list">
+            {% for analysis in analyses %}
+            <div class="analysis-card">
+                <h4>{{ analysis.title }}</h4>
+                <p>{{ analysis.description }}</p>
+                <span class="date">{{ analysis.created_at }}</span>
+            </div>
+            {% endfor %}
+          </div>
       </div>
-    </section>
-
-    <section id="research-list">
-      <h2>Research Project List</h2>
-      <ul id="project-list">
-        <!-- Dynamic project list -->
-      </ul>
-    </section>
-  </main>
-  <script src="C:\Users\user\OneDrive\Desktop\bruce li\static\js\dashboard.js"></script>
-</body>
-</html>
+      {% endif %}
+  
+      {% if recent_activities %}
+      <div class="activities-section">
+          <h3>Recent Activities</h3>
+          <div class="activity-list">
+              {% for activity in recent_activities %}
+              <div class="activity-item">
+                  <span class="activity-type">{{ activity.activity_type }}</span>
+                  <p>{{ activity.description }}</p>
+                  <span class="date">{{ activity.created_at }}</span>
+              </div>
+              {% endfor %}
+          </div>
+      </div>
+      {% endif %}
+  </div>
+  {% endblock %}

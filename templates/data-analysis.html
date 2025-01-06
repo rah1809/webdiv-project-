@@ -1,53 +1,77 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Data Analysis</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/data.css') }}">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-  <!-- Navigation Menu -->
-  <nav>
-    <ul class="menu">
-      <li><a href="login.html">Login Page</a></li>
-      <li><a href="dashboard.html">Dashboard</a></li>
-      <li><a href="research-profile.html">Research Profile</a></li>
-      <li><a href="group-research.html">Group Research</a></li>
-      <li><a href="project-management.html">Project Management</a></li>
-      <li><a href="library.html">Library</a></li>
-      <li><a href="data-analysis.html" class="active">Data Analysis</a></li>
-      <li><a href="collaboration.html">Collaboration</a></li>
-    </ul>
-  </nav>
+{% extends "base.html" %}
 
-  <!-- Data Analysis Section -->
-  <header>
+{% block title %}Data Analysis{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/data.css') }}">
+{% endblock %}
+
+{% block nav_title %}data-analysis{% endblock %}
+
+{% block content %}
+<header>
     <h1>Data Analysis</h1>
-  </header>
-  <main>
-    <!-- Upload Section -->
-    <section id="upload-data">
-      <h2>Upload Dataset</h2>
-      <input type="file" id="file-input" accept=".csv">
-      <button id="upload-button">Upload</button>
+</header>
+<main>
+    <!-- Analysis Form Section -->
+    <section class="analysis-form">
+        <h2 id="form-title">Create New Analysis</h2>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="flash-message">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <form id="analysis-form" method="POST">
+            <div class="form-group">
+                <label for="title">Analysis Title:</label>
+                <input type="text" id="title" name="title" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Description:</label>
+                <textarea id="description" name="description" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="data-type">Data Type:</label>
+                <select id="data-type" name="data_type" required>
+                    <option value="quantitative">Quantitative</option>
+                    <option value="qualitative">Qualitative</option>
+                    <option value="mixed">Mixed Methods</option>
+                </select>
+            </div>
+            <button type="submit" id="submit-btn">Create Analysis</button>
+        </form>
     </section>
 
-    <!-- Data Table Section -->
-    <section id="data-table">
-      <h2>Data Preview</h2>
-      <table id="data-table-view">
-        <!-- Table content populated dynamically -->
-      </table>
+    <!-- Analysis List Section -->
+    <section class="analysis-list">
+        <h2>Your Analyses</h2>
+        {% if analyses %}
+            {% for analysis in analyses %}
+            <div class="analysis-card">
+                <h3>{{ analysis.title }}</h3>
+                <p>{{ analysis.description }}</p>
+                <div class="meta-info">
+                    <span>Type: {{ analysis.data_type }}</span>
+                    <span>Created: {{ analysis.created_at.strftime('%Y-%m-%d') }}</span>
+                    <span>Status: {{ analysis.status }}</span>
+                </div>
+                <div class="actions">
+                    <button class="view-btn" data-id="{{ analysis._id }}">View</button>
+                    <button class="edit-btn" data-id="{{ analysis._id }}">Edit</button>
+                    <button class="delete-btn" data-id="{{ analysis._id }}">Delete</button>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p class="no-data">No analyses found. Create your first analysis above!</p>
+        {% endif %}
     </section>
+</main>
+{% endblock %}
 
-    <!-- Chart Section -->
-    <section id="data-visualization">
-      <h2>Data Visualization</h2>
-      <canvas id="data-chart"></canvas>
-    </section>
-  </main>
-  <script src="C:\Users\user\OneDrive\Desktop\bruce li\static\js\data.js"></script>
-</body>
-</html>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/data.js') }}"></script>
+{% endblock %}
+

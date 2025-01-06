@@ -1,107 +1,117 @@
 // script.js
-document.addEventListener("DOMContentLoaded", () => {
-    const fileInput = document.getElementById("file-input");
-    const uploadButton = document.getElementById("upload-button");
-    const dataTable = document.getElementById("data-table-view");
-    const dataChartCanvas = document.getElementById("data-chart");
-  
-    let dataset = [];
-  
-    // Handle File Upload
-    uploadButton.addEventListener("click", () => {
-      const file = fileInput.files[0];
-      if (!file) {
-        alert("Please select a CSV file to upload.");
-        return;
-      }
-  
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const csvData = event.target.result;
-        dataset = parseCSV(csvData);
-        renderTable(dataset);
-        renderChart(dataset);
-      };
-      reader.readAsText(file);
-    });
-  
-    // Parse CSV to Array of Objects
-    const parseCSV = (csv) => {
-      const lines = csv.split("\n").filter((line) => line.trim() !== "");
-      const headers = lines[0].split(",");
-      return lines.slice(1).map((line) => {
-        const values = line.split(",");
-        return headers.reduce((obj, header, index) => {
-          obj[header.trim()] = values[index].trim();
-          return obj;
-        }, {});
-      });
-    };
-  
-    // Render Data Table
-    const renderTable = (data) => {
-      dataTable.innerHTML = "";
-      if (data.length === 0) return;
-  
-      // Add headers
-      const headers = Object.keys(data[0]);
-      const headerRow = document.createElement("tr");
-      headers.forEach((header) => {
-        const th = document.createElement("th");
-        th.textContent = header;
-        headerRow.appendChild(th);
-      });
-      dataTable.appendChild(headerRow);
-  
-      // Add rows
-      data.forEach((row) => {
-        const tr = document.createElement("tr");
-        headers.forEach((header) => {
-          const td = document.createElement("td");
-          td.textContent = row[header];
-          tr.appendChild(td);
+document.addEventListener('DOMContentLoaded', function() {
+    // Form submission handler
+    const analysisForm = document.getElementById('analysis-form');
+    if (analysisForm) {
+        analysisForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            submitAnalysis();
         });
-        dataTable.appendChild(tr);
-      });
+    }
 
-    };
-  
-    // Render Chart
-    const renderChart = (data) => {
-      console.log("chart data >>",data)
-      if (data.length === 0) return;
-  
-      // Use first two columns for chart
-      const labels = data.map((row) => row[Object.keys(row)[0]]);
-      const values = data.map((row) => {
-        console.log("row item",row[Object.keys(row)[1]])
-        parseFloat(row[Object.keys(row)[1]]) || 0);
-      }
-      console.log("labels >>", labels)
-      console.log("values >>", values)
-      new Chart(dataChartCanvas, {
-        type: "bar",
-        data: {
-          labels,
-          datasets: [
-            {
-              label: "Data Analysis",
-              data: values,
-              backgroundColor: "rgba(75, 192, 192, 0.2)",
-              borderColor: "rgba(75, 192, 192, 1)",
-              borderWidth: 1,
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          scales: {
-            y: {
-              beginAtZero: true,
-            },
-          },
-        },
-      });
-    };
-  });
+    // Initialize analysis actions
+    setupAnalysisActions();
+
+    // Function to submit analysis
+    function submitAnalysis() {
+        const formData = new FormData(analysisForm);
+        
+        fetch('/data-analysis.html', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showMessage('Analysis created successfully!', 'success');
+                location.reload(); // Reload to show new analysis
+            } else {
+                showMessage(data.message || 'Error creating analysis', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessage('Failed to create analysis', 'error');
+        });
+    }
+
+    // Function to handle analysis actions
+    function setupAnalysisActions() {
+        // View Analysis
+        document.querySelectorAll('.view-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const analysisId = this.dataset.id;
+                window.location.href = `/data-analysis/view/${analysisId}`;
+            });
+        });
+
+        // Edit Analysis
+        document.querySelectorAll('.edit-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const analysisId = this.dataset.id;
+                editAnalysis(analysisId);
+            });
+        });
+
+        // Delete Analysis
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const analysisId = this.dataset.id;
+                if (confirm('Are you sure you want to delete this analysis?')) {
+                    deleteAnalysis(analysisId);
+                }
+            });
+        });
+    }
+
+    // Function to edit analysis
+    function editAnalysis(analysisId) {
+        fetch(`/data-analysis/view/${analysisId}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('title').value = data.title;
+                document.getElementById('description').value = data.description;
+                document.getElementById('data-type').value = data.data_type;
+                
+                // Show edit form
+                document.getElementById('analysis-form').style.display = 'block';
+                document.getElementById('form-title').textContent = 'Edit Analysis';
+                document.getElementById('submit-btn').textContent = 'Update';
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    // Function to delete analysis
+    function deleteAnalysis(analysisId) {
+        fetch(`/data-analysis/${analysisId}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showMessage('Analysis deleted successfully!', 'success');
+                location.reload();
+            } else {
+                showMessage(data.message || 'Error deleting analysis', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessage('Failed to delete analysis', 'error');
+        });
+    }
+
+    // Function to show messages
+    function showMessage(message, type) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `flash-message ${type}`;
+        messageDiv.textContent = message;
+        
+        const container = document.querySelector('.analysis-form');
+        container.insertBefore(messageDiv, container.firstChild);
+        
+        // Remove message after 3 seconds
+        setTimeout(() => messageDiv.remove(), 3000);
+    }
+});
   

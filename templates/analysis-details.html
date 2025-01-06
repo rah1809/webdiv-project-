@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Analysis Details{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/data.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="analysis-details">
+    <h1>{{ analysis.title }}</h1>
+    
+    <div class="analysis-meta">
+        <span>Type: {{ analysis.data_type }}</span>
+        <span>Created: {{ analysis.created_at.strftime('%Y-%m-%d') }}</span>
+        <span>Status: {{ analysis.status }}</span>
+    </div>
+
+    <div class="analysis-description">
+        <h2>Description</h2>
+        <p>{{ analysis.description }}</p>
+    </div>
+
+    <div class="analysis-data">
+        <h2>Data Visualization</h2>
+        <div class="chart-container">
+            <canvas id="data-chart"></canvas>
+        </div>
+        
+        <div class="data-table-container">
+            <h3>Data Table</h3>
+            <table id="data-table-view" class="data-table">
+                <!-- Data will be populated by JavaScript -->
+            </table>
+        </div>
+    </div>
+
+    <div class="analysis-actions">
+        <button onclick="shareAnalysis('{{ analysis._id }}')">Share Analysis</button>
+        <button onclick="exportAnalysis('{{ analysis._id }}')">Export Data</button>
+        <button onclick="window.location.href='{{ url_for('data_analysis') }}'">Back to List</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/data.js') }}"></script>
+<script>
+function shareAnalysis(analysisId) {
+    window.location.href = `/data-analysis/share/${analysisId}`;
+}
+
+function exportAnalysis(analysisId) {
+    fetch(`/data-analysis/export/${analysisId}`)
+        .then(response => response.json())
+        .then(data => {
+            // Create and download export file
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `analysis-${analysisId}.json`;
+            a.click();
+        });
+}
+</script>
+{% endblock %} 
