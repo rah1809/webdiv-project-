@@ -1,6 +1,7 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify, send_file
 from db import Database
 import os
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__,
             template_folder='templates',
@@ -90,7 +91,61 @@ def group_research():
 
 @app.route('/library.html')
 def library():
-    return render_template('library.html')
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    
+    # Get all library resources
+    resources = db.get_library_resources()
+    return render_template('library.html', resources=resources)
+
+@app.route('/library/search')
+def search_library():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    
+    query = request.args.get('q', '')
+    resources = db.search_library_resources(query)
+    return jsonify(resources)
+
+@app.route('/library/add', methods=['POST'])
+def add_library_resource():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    
+    try:
+        file = request.files['file']
+        if file:
+            # Create uploads directory if it doesn't exist
+            upload_dir = os.path.join('static', 'uploads', 'library')
+            os.makedirs(upload_dir, exist_ok=True)
+            
+            # Save the file
+            filename = secure_filename(file.filename)
+            file_path = os.path.join(upload_dir, filename)
+            file.save(file_path)
+        else:
+            file_path = None
+
+        # Prepare resource data
+        resource_data = {
+            'title': request.form.get('title'),
+            'author': request.form.get('author'),
+            'description': request.form.get('description'),
+            'file_path': file_path,
+            'uploaded_by': session['username'],
+            'category': request.form.get('category'),
+            'tags': request.form.get('tags', '').split(',')
+        }
+        
+        # Add resource to database
+        resource_id = db.add_library_resource(resource_data)
+        
+        if resource_id:
+            return jsonify({'success': True, 'message': 'Resource added successfully'})
+        return jsonify({'success': False, 'message': 'Failed to add resource'})
+    
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)})
 
 @app.route('/login')
 def login():
