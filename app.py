@@ -135,13 +135,229 @@ def register():
     
     return render_template('register.html')
 
-@app.route('/project-management.html')
+@app.route('/project-management.html', methods=['GET', 'POST'])
 def project_management():
-    return render_template('project-management.html')
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    
+    if request.method == 'POST':
+        project_data = {
+            'title': request.form.get('title'),
+            'description': request.form.get('description'),
+            'start_date': request.form.get('start_date'),
+            'end_date': request.form.get('end_date'),
+            'project_type': request.form.get('project_type'),
+            'supervisor': request.form.get('supervisor'),
+            'team_members': request.form.getlist('team_members'),
+            'funding_source': request.form.get('funding_source'),
+            'budget': request.form.get('budget'),
+            'objectives': request.form.getlist('objectives'),
+            'deliverables': request.form.getlist('deliverables'),
+            'created_by': session['username']
+        }
+        
+        project_id, message = db.create_project(project_data)
+        if project_id:
+            flash('Project created successfully!')
+        else:
+            flash('Error creating project: ' + message)
+        
+        return redirect(url_for('project_management'))
+    
+    # Get user's projects
+    projects = db.get_user_projects(session['username'])
+    return render_template('project-management.html', projects=projects)
 
-@app.route('/research-profile.html')
+@app.route('/project/<project_id>', methods=['GET'])
+def view_project(project_id):
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    
+    project = db.get_project(project_id)
+    if not project:
+        flash('Project not found')
+        return redirect(url_for('project_management'))
+    
+    return render_template('project-details.html', project=project)
+
+@app.route('/project/<project_id>/update', methods=['POST'])
+def update_project(project_id):
+    if 'username' not in session:
+        return jsonify({'success': False, 'message': 'Not logged in'})
+    
+    update_data = {
+        'title': request.form.get('title'),
+        'description': request.form.get('description'),
+        'start_date': request.form.get('start_date'),
+        'end_date': request.form.get('end_date'),
+        'status': request.form.get('status'),
+        'team_members': request.form.getlist('team_members')
+    }
+    
+    success, message = db.update_project(project_id, update_data)
+    return jsonify({'success': success, 'message': message})
+
+@app.route('/project/<project_id>/task', methods=['POST'])
+def add_project_task(project_id):
+    if 'username' not in session:
+        return jsonify({'success': False, 'message': 'Not logged in'})
+    
+    task_data = {
+        'title': request.form.get('title'),
+        'description': request.form.get('description'),
+        'assigned_to': request.form.get('assigned_to'),
+        'due_date': request.form.get('due_date'),
+        'priority': request.form.get('priority')
+    }
+    
+    success = db.add_project_task(project_id, task_data)
+    return jsonify({'success': success})
+
+@app.route('/project/<project_id>/status', methods=['POST'])
+def update_project_status(project_id):
+    if 'username' not in session:
+        return jsonify({'success': False, 'message': 'Not logged in'})
+    
+    status = request.form.get('status')
+    success = db.update_project_status(project_id, status)
+    return jsonify({'success': success})
+
+@app.route('/research-profile.html', methods=['GET', 'POST'])
 def research_profile():
-    return render_template('research-profile.html')
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    
+    if request.method == 'POST':
+        profile_data = {
+            'full_name': request.form.get('full_name'),
+            'student_id': request.form.get('student_id'),
+            'email': request.form.get('email'),
+            'phone': request.form.get('phone'),
+            'university': request.form.get('university'),
+            'department': request.form.get('department'),
+            'position': request.form.get('position'),
+            'specialization': request.form.get('specialization'),
+            'research_areas': request.form.getlist('research_areas'),
+            'research_interests': request.form.getlist('research_interests'),
+            'thesis_topic': request.form.get('thesis_topic'),
+            'current_projects': request.form.getlist('current_projects')
+        }
+        
+        success, message = db.create_researcher_profile(session['username'], profile_data)
+        if success:
+            flash('Profile updated successfully!')
+        else:
+            flash('Error updating profile: ' + message)
+        
+        return redirect(url_for('research_profile'))
+    
+    # Get existing profile data
+    profile = db.get_researcher_profile(session['username'])
+    return render_template('research-profile.html', profile=profile)
+
+@app.route('/add-education', methods=['POST'])
+def add_education():
+    if 'username' not in session:
+        return jsonify({'success': False, 'message': 'Not logged in'})
+    
+    education_data = {
+        'degree': request.form.get('degree'),
+        'institution': request.form.get('institution'),
+        'field': request.form.get('field'),
+        'year': request.form.get('year'),
+        'achievements': request.form.getlist('achievements')
+    }
+    
+    success, message = db.add_education_detail(session['username'], education_data)
+    return jsonify({'success': success, 'message': message})
+
+@app.route('/update-research', methods=['POST'])
+def update_research():
+    if 'username' not in session:
+        return jsonify({'success': False, 'message': 'Not logged in'})
+    
+    work_data = {
+        'current_projects': request.form.getlist('current_projects'),
+        'publications': request.form.getlist('publications'),
+        'research_interests': request.form.getlist('research_interests')
+    }
+    
+    success, message = db.update_research_work(session['username'], work_data)
+    return jsonify({'success': success, 'message': message})
+
+@app.route('/add-research-topic', methods=['POST'])
+def add_research_topic():
+    if 'username' not in session:
+        return jsonify({'success': False, 'message': 'Not logged in'})
+    
+    topic_data = {
+        'title': request.form.get('title'),
+        'description': request.form.get('description'),
+        'category': request.form.get('category'),
+        'status': request.form.get('status'),
+        'start_date': request.form.get('start_date'),
+        'supervisor': request.form.get('supervisor')
+    }
+    
+    success = db.add_research_topic(session['username'], topic_data)
+    if success:
+        return jsonify({'success': True})
+    return jsonify({'success': False, 'message': 'Failed to add research topic'})
+
+@app.route('/update-academic-progress', methods=['POST'])
+def update_academic_progress():
+    if 'username' not in session:
+        return jsonify({'success': False, 'message': 'Not logged in'})
+    
+    progress_data = {
+        'semester': request.form.get('semester'),
+        'gpa': request.form.get('gpa'),
+        'completed_credits': request.form.get('completed_credits'),
+        'research_progress': request.form.get('research_progress')
+    }
+    
+    success = db.update_academic_progress(session['username'], progress_data)
+    if success:
+        return jsonify({'success': True})
+    return jsonify({'success': False, 'message': 'Failed to update progress'})
+
+@app.route('/add-publication', methods=['POST'])
+def add_publication():
+    if 'username' not in session:
+        return jsonify({'success': False, 'message': 'Not logged in'})
+    
+    publication_data = {
+        'title': request.form.get('title'),
+        'authors': request.form.getlist('authors'),
+        'journal': request.form.get('journal'),
+        'year': request.form.get('year'),
+        'doi': request.form.get('doi')
+    }
+    
+    success = db.add_publication(session['username'], publication_data)
+    if success:
+        db.update_research_stats(session['username'])
+        return jsonify({'success': True})
+    return jsonify({'success': False, 'message': 'Failed to add publication'})
+
+@app.route('/add-project', methods=['POST'])
+def add_project():
+    if 'username' not in session:
+        return jsonify({'success': False, 'message': 'Not logged in'})
+    
+    project_data = {
+        'title': request.form.get('title'),
+        'description': request.form.get('description'),
+        'start_date': request.form.get('start_date'),
+        'end_date': request.form.get('end_date'),
+        'collaborators': request.form.getlist('collaborators'),
+        'funding': request.form.get('funding')
+    }
+    
+    success = db.add_research_project(session['username'], project_data)
+    if success:
+        return jsonify({'success': True})
+    return jsonify({'success': False, 'message': 'Failed to add project'})
 
 @app.route('/tlogin.html')
 def tlogin():
