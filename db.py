@@ -13,19 +13,22 @@ class Database:
             self.db = self.client['ResearchDB']
             
             # Initialize collections
-            self.login_collection = self.db['Login']
-            self.user_profiles = self.db['UserProfiles']
-            self.data_analysis = self.db['DataAnalysis']
-            self.research_groups = self.db['ResearchGroups']
-            self.online_users = self.db['OnlineUsers']
-            self.library_collection = self.db['library']
+            self.collections = {
+                'login': self.db['Login'],
+                'user_profiles': self.db['UserProfiles'],
+                'data_analysis': self.db['DataAnalysis'],
+                'research_groups': self.db['ResearchGroups'],
+                'online_users': self.db['OnlineUsers'],
+                'library': self.db['Library']
+            }
+            
+            # Create direct references for commonly used collections
+            self.login_collection = self.collections['login']
+            self.user_profiles = self.collections['user_profiles']
             
             # Test connection
             self.client.admin.command('ping')
             print(f"Successfully connected to MongoDB. Database: {self.db.name}")
-            
-            # Create indexes
-            self._create_indexes()
             
         except Exception as e:
             print(f"Database connection error: {e}")
@@ -68,42 +71,45 @@ class Database:
             return False
 
 
-    def add_user(self, username, password):
-        """Add a new user to the database"""
-        # Check if username already exists
-        if self.login_collection.find_one({'username': username}):
-            return False, "Username already exists"
-        
-        # Create new user document
-        user = {
-            'username': username,
-            'password': generate_password_hash(password),
-            'created_at': datetime.utcnow(),
-            'last_login': None,
-            'is_active': True
-        }
-        
-        # Insert the user login credentials
-        self.login_collection.insert_one(user)
-        
-        # Create user profile
-        user_profile = {
-            'username': username,
-            'email': email,
-            'full_name': full_name,
-            'registration_date': datetime.utcnow(),
-            'profile_completed': False,
-            'research_interests': [],
-            'university': None,
-            'department': None,
-            'student_id': None,
-            'projects': [],
-            'publications': []
-        }
-        
-        # Insert the user profile
-        self.user_profiles.insert_one(user_profile)
-        return True, "Registration successful"
+    def add_user(self, username, password, email=None, full_name=None):
+        """Add a new user to the database with profile"""
+        try:
+            # Check if username already exists
+            if self.login_collection.find_one({'username': username}):
+                return False, "Username already exists"
+            
+            # Create new user document
+            user = {
+                'username': username,
+                'password': generate_password_hash(password),
+                'created_at': datetime.utcnow(),
+                'last_login': None,
+                'is_active': True
+            }
+            
+            # Insert the user login credentials
+            self.login_collection.insert_one(user)
+            
+            # Create user profile
+            user_profile = {
+                'username': username,
+                'email': email,
+                'full_name': full_name,
+                'created_at': datetime.utcnow(),
+                'profile_completed': False,
+                'research_interests': [],
+                'university': None,
+                'department': None,
+                'student_id': None
+            }
+            
+            # Insert the user profile
+            self.user_profiles.insert_one(user_profile)
+            return True, "Registration successful"
+            
+        except Exception as e:
+            print(f"Error adding user: {e}")
+            return False, str(e)
 
     def verify_user(self, username, password):
         """Verify user credentials and update last login"""
@@ -215,26 +221,46 @@ class Database:
 
     def get_user_data(self, username):
         """Get user information from database"""
-        query = "SELECT username, email, full_name, created_at FROM users WHERE username = ?"
-        result = self.execute_query(query, (username,), fetch_one=True)
-        return result if result else None
+        try:
+            # First check if user exists in login collection
+            user = self.login_collection.find_one({'username': username})
+            if not user:
+                return None
+            
+            # Then get profile data
+            profile = self.user_profiles.find_one(
+                {'username': username},
+                {
+                    'username': 1, 
+                    'email': 1, 
+                    'full_name': 1, 
+                    'created_at': 1, 
+                    '_id': 0
+                }
+            )
+            return profile if profile else {
+                'username': username,
+                'email': None,
+                'full_name': None,
+                'created_at': user.get('created_at')
+            }
+        except Exception as e:
+            print(f"Error retrieving user data: {e}")
+            return None
 
     def get_recent_activities(self, username):
         """Get user's recent activities"""
-        query = """
-            SELECT activity_type, description, created_at 
-            FROM user_activities 
-            WHERE username = ? 
-            ORDER BY created_at DESC 
-            LIMIT 10
-        """
-        return self.execute_query(query, (username,), fetch_all=True)
+        return list(self.db['UserActivities'].find(
+            {'username': username},
+            {'activity_type': 1, 'description': 1, 'created_at': 1, '_id': 0}
+        ).sort('created_at', -1).limit(10))
 
     def update_last_login(self, username):
         """Update user's last login timestamp"""
-        query = "UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE username = ?"
-        self.execute_query(query, (username,))
-        self.conn.commit()
+        self.login_collection.update_one(
+            {'username': username},
+            {'$set': {'last_login': datetime.utcnow()}}
+        )
 
     def get_analysis_by_id(self, analysis_id):
         """Get analysis by ID"""
