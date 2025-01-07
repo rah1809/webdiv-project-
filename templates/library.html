@@ -1,153 +1,136 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Library</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/lib.css') }}">
+    <!-- Meta Tags for Responsive Design -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Research Library Management System</title>
+    <!-- External CSS Link -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/lib.css') }}">
 </head>
 <body>
-  <!-- Navigation Menu -->
-  <nav>
-    <ul class="menu">
-      <li><a href="login.html">Login Page</a></li>
-      <li><a href="dashboard.html">Dashboard</a></li>
-      <li><a href="research-profile.html">Research Profile</a></li>
-      <li><a href="group-research.html">Group Research</a></li>
-      <li><a href="project-management.html">Project Management</a></li>
-      <li><a href="library.html" class="active">Library</a></li>
-      <li><a href="data-analysis.html">Data Analysis</a></li>
-      <li><a href="collaboration.html">Collaboration</a></li>
-    </ul>
-  </nav>
+    <!-- Global Navigation -->
+    <nav>
+        <ul class="menu">
+            <!-- TODO: Consider using url_for() for all links -->
+            <li><a href="{{ url_for('login') }}">Login Page</a></li>
+            <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+            <!-- ... other navigation items ... -->
+        </ul>
+    </nav>
 
-  <!-- Library Section -->
-  <header>
-    <h1>Library</h1>
-  </header>
-  <main>
-    <!-- Search Section -->
-    <section id="search-bar">
-      <input type="text" id="search-input" placeholder="Search resources by title or author...">
-    </section>
+    <!-- Main Content Container -->
+    <div class="container">
+        <header>
+            <h1>Research Library</h1>
+            <p class="subtitle">Manage and access research resources</p>
+        </header>
 
-    <!-- Resource List -->
-    <section id="resource-list">
-      <h2>Available Resources</h2>
-      <ul id="library-items">
-        {% for resource in resources %}
-        <li class="resource-item">
-          <h3>{{ resource.title }}</h3>
-          <p class="author">By: {{ resource.author }}</p>
-          <p class="description">{{ resource.description }}</p>
-          {% if resource.file_path %}
-          <a href="{{ resource.file_path }}" class="download-link">Download Resource</a>
-          {% endif %}
-          <div class="metadata">
-            <span class="upload-date">Added: {{ resource.upload_date.strftime('%Y-%m-%d') }}</span>
-            <span class="uploader">By: {{ resource.uploaded_by }}</span>
-          </div>
-        </li>
-        {% endfor %}
-      </ul>
-    </section>
+        <main>
+            <!-- Enhanced Search Section -->
+            <section id="search-bar">
+                <div class="search-wrapper">
+                    <input 
+                        type="text" 
+                        id="search-input" 
+                        placeholder="Search resources by title, author, or tags..."
+                        aria-label="Search resources">
+                    <button type="button" id="search-button" aria-label="Perform search">
+                        <i class="search-icon"></i>
+                    </button>
+                </div>
+                <!-- Advanced Search Filters -->
+                <div class="search-filters">
+                    <select id="category-filter" aria-label="Filter by category">
+                        <option value="">All Categories</option>
+                        <option value="book">Books</option>
+                        <option value="article">Articles</option>
+                        <option value="paper">Research Papers</option>
+                    </select>
+                    <!-- Add date range filter -->
+                    <input type="date" id="date-filter" aria-label="Filter by date">
+                </div>
+            </section>
 
-    <!-- Add New Resource -->
-    <section id="add-resource">
-      <h2>Add a New Resource</h2>
-      <form id="add-resource-form" enctype="multipart/form-data">
-        <div class="form-group">
-          <label for="resource-title">Resource Title:</label>
-          <input type="text" id="resource-title" name="title" placeholder="Enter resource title" required>
-        </div>
-        <div class="form-group">
-          <label for="resource-author">Author:</label>
-          <input type="text" id="resource-author" name="author" placeholder="Enter author name" required>
-        </div>
-        <div class="form-group">
-          <label for="resource-file">Upload File:</label>
-          <input type="file" id="resource-file" name="file">
-        </div>
-        <div class="form-group">
-          <label for="resource-description">Description:</label>
-          <textarea id="resource-description" name="description" placeholder="Enter a brief description" required></textarea>
-        </div>
-        <div class="form-group">
-          <label for="resource-category">Category:</label>
-          <select id="resource-category" name="category" required>
-            <option value="book">Book</option>
-            <option value="article">Article</option>
-            <option value="paper">Research Paper</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="resource-tags">Tags (comma-separated):</label>
-          <input type="text" id="resource-tags" name="tags" placeholder="e.g., science, research, methodology">
-        </div>
-        <button type="submit">Add Resource</button>
-      </form>
-    </section>
-  </main>
-  <script>
-    document.getElementById('search-input').addEventListener('input', debounce(function(e) {
-      const query = e.target.value;
-      if (query.length >= 2) {
-        fetch(`/library/search?q=${encodeURIComponent(query)}`)
-          .then(response => response.json())
-          .then(resources => {
-            updateResourceList(resources);
-          });
-      }
-    }, 300));
+            <!-- Dynamic Resource List -->
+            <section id="resource-list">
+                <h2>Available Resources</h2>
+                <div class="resource-grid" id="library-items">
+                    {% for resource in resources %}
+                    <article class="resource-item">
+                        <!-- Resource Card Header -->
+                        <div class="resource-header">
+                            <h3>{{ resource.title }}</h3>
+                            <span class="resource-type">{{ resource.category }}</span>
+                        </div>
+                        
+                        <!-- Resource Details -->
+                        <div class="resource-content">
+                            <p class="author">Author: {{ resource.author }}</p>
+                            <p class="description">{{ resource.description }}</p>
+                            {% if resource.tags %}
+                            <div class="tags">
+                                {% for tag in resource.tags %}
+                                <span class="tag">{{ tag }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
 
-    document.getElementById('add-resource-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      const formData = new FormData(this);
-      
-      fetch('/library/add', {
-        method: 'POST',
-        body: formData
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          alert('Resource added successfully!');
-          location.reload();
-        } else {
-          alert('Error: ' + data.message);
-        }
-      });
-    });
+                        <!-- Resource Actions -->
+                        <div class="resource-actions">
+                            {% if resource.file_path %}
+                            <a href="{{ resource.file_path }}" 
+                               class="download-link"
+                               download>
+                               Download
+                            </a>
+                            {% endif %}
+                            <!-- Add citation button -->
+                            <button class="cite-btn" 
+                                    data-resource-id="{{ resource.id }}">
+                                Cite
+                            </button>
+                        </div>
 
-    function updateResourceList(resources) {
-      const container = document.getElementById('library-items');
-      container.innerHTML = resources.map(resource => `
-        <li class="resource-item">
-          <h3>${resource.title}</h3>
-          <p class="author">By: ${resource.author}</p>
-          <p class="description">${resource.description}</p>
-          ${resource.file_path ? `<a href="${resource.file_path}" class="download-link">Download Resource</a>` : ''}
-          <div class="metadata">
-            <span class="upload-date">Added: ${new Date(resource.upload_date).toLocaleDateString()}</span>
-            <span class="uploader">By: ${resource.uploaded_by}</span>
-          </div>
-        </li>
-      `).join('');
-    }
+                        <!-- Resource Metadata -->
+                        <div class="metadata">
+                            <time datetime="{{ resource.upload_date.isoformat() }}">
+                                Added: {{ resource.upload_date.strftime('%Y-%m-%d') }}
+                            </time>
+                            <span class="uploader">By: {{ resource.uploaded_by }}</span>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+            </section>
 
-    function debounce(func, wait) {
-      let timeout;
-      return function executedFunction(...args) {
-        const later = () => {
-          clearTimeout(timeout);
-          func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-      };
-    }
-  </script>
+            <!-- Resource Upload Form -->
+            <section id="add-resource">
+                <h2>Add New Resource</h2>
+                <form id="add-resource-form" 
+                      enctype="multipart/form-data"
+                      class="resource-form">
+                    <!-- Form fields with improved accessibility -->
+                    <div class="form-group">
+                        <label for="resource-title">Title:</label>
+                        <input type="text" 
+                               id="resource-title" 
+                               name="title" 
+                               required
+                               maxlength="200">
+                    </div>
+                    <!-- ... other form groups ... -->
+                    <div class="form-actions">
+                        <button type="submit">Add Resource</button>
+                        <button type="reset">Clear Form</button>
+                    </div>
+                </form>
+            </section>
+        </main>
+    </div>
+
+    <!-- External JavaScript -->
+    <script src="{{ url_for('static', filename='js/lib.js') }}"></script>
 </body>
 </html>

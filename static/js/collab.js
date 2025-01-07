@@ -3,30 +3,60 @@ const chatForm = document.getElementById('chat-form');
 const chatInput = document.getElementById('chat-input');
 const chatMessages = document.getElementById('chat-messages');
 
-chatForm.addEventListener('submit', function (event) {
-  event.preventDefault();
+// Load existing messages
+async function loadMessages() {
+    const response = await fetch('/api/messages');
+    const messages = await response.json();
+    chatMessages.innerHTML = '';
+    messages.reverse().forEach(message => {
+        addMessageToChat(message);
+    });
+}
 
-  const message = chatInput.value.trim();
-  if (message) {
-    // Simulate adding a message
+function addMessageToChat(message) {
     const newMessage = document.createElement('div');
-    newMessage.textContent = `You: ${message}`;
+    const time = new Date(message.timestamp).toLocaleTimeString();
+    newMessage.textContent = `${message.user} (${time}): ${message.message}`;
     chatMessages.appendChild(newMessage);
-
-    // Scroll to the bottom of the chat box
     chatMessages.scrollTop = chatMessages.scrollHeight;
+}
 
-    // Clear input field
-    chatInput.value = '';
-  }
+chatForm.addEventListener('submit', async function (event) {
+    event.preventDefault();
+    const message = chatInput.value.trim();
+    if (message) {
+        const response = await fetch('/api/messages', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ message: message })
+        });
+        const newMessage = await response.json();
+        addMessageToChat(newMessage);
+        chatInput.value = '';
+    }
 });
 
-// Simulate adding online users
-const onlineUsers = document.getElementById('online-users');
-const sampleUsers = ['Alice', 'Bob', 'Charlie', 'Diana'];
+// Handle online users
+async function updateOnlineUsers() {
+    const response = await fetch('/api/online-users');
+    const users = await response.json();
+    const onlineUsers = document.getElementById('online-users');
+    onlineUsers.innerHTML = '';
+    users.forEach(user => {
+        const userItem = document.createElement('li');
+        userItem.textContent = user.username;
+        onlineUsers.appendChild(userItem);
+    });
+}
 
-sampleUsers.forEach((user) => {
-  const userItem = document.createElement('li');
-  userItem.textContent = user;
-  onlineUsers.appendChild(userItem);
-});
+// Initial load
+loadMessages();
+updateOnlineUsers();
+
+// Update online users every 30 seconds
+setInterval(updateOnlineUsers, 30000);
+
+// Poll for new messages every 3 seconds
+setInterval(loadMessages, 3000);
