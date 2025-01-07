@@ -18,6 +18,7 @@ class Database:
             self.data_analysis = self.db['DataAnalysis']
             self.research_groups = self.db['ResearchGroups']
             self.online_users = self.db['OnlineUsers']
+            self.library_collection = self.db['library']
             
             # Test connection
             self.client.admin.command('ping')
@@ -559,3 +560,49 @@ class Database:
             return True, "Education detail added successfully"
         except Exception as e:
             return False, str(e)
+
+    def add_library_resource(self, resource_data):
+        """Add a new resource to the library"""
+        try:
+            resource = {
+                'title': resource_data.get('title'),
+                'author': resource_data.get('author'),
+                'description': resource_data.get('description'),
+                'file_path': resource_data.get('file_path'),
+                'uploaded_by': resource_data.get('uploaded_by'),
+                'upload_date': datetime.utcnow(),
+                'category': resource_data.get('category'),
+                'tags': resource_data.get('tags', []),
+                'available': True
+            }
+            
+            result = self.library_collection.insert_one(resource)
+            return str(result.inserted_id)
+        except Exception as e:
+            print(f"Error adding resource: {e}")
+            return None
+
+    def get_library_resources(self, limit=None, skip=0):
+        """Get all library resources"""
+        try:
+            query = self.library_collection.find().sort('upload_date', -1).skip(skip)
+            if limit:
+                query = query.limit(limit)
+            return list(query)
+        except Exception as e:
+            print(f"Error retrieving resources: {e}")
+            return []
+
+    def search_library_resources(self, search_query):
+        """Search library resources by title or author"""
+        try:
+            return list(self.library_collection.find({
+                '$or': [
+                    {'title': {'$regex': search_query, '$options': 'i'}},
+                    {'author': {'$regex': search_query, '$options': 'i'}},
+                    {'description': {'$regex': search_query, '$options': 'i'}}
+                ]
+            }))
+        except Exception as e:
+            print(f"Error searching resources: {e}")
+            return []
