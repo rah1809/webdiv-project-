@@ -35,14 +35,27 @@
     <section id="resource-list">
       <h2>Available Resources</h2>
       <ul id="library-items">
-        <!-- Dynamic resources will be populated here -->
+        {% for resource in resources %}
+        <li class="resource-item">
+          <h3>{{ resource.title }}</h3>
+          <p class="author">By: {{ resource.author }}</p>
+          <p class="description">{{ resource.description }}</p>
+          {% if resource.file_path %}
+          <a href="{{ resource.file_path }}" class="download-link">Download Resource</a>
+          {% endif %}
+          <div class="metadata">
+            <span class="upload-date">Added: {{ resource.upload_date.strftime('%Y-%m-%d') }}</span>
+            <span class="uploader">By: {{ resource.uploaded_by }}</span>
+          </div>
+        </li>
+        {% endfor %}
       </ul>
     </section>
 
     <!-- Add New Resource -->
     <section id="add-resource">
       <h2>Add a New Resource</h2>
-      <form id="add-resource-form">
+      <form id="add-resource-form" enctype="multipart/form-data">
         <div class="form-group">
           <label for="resource-title">Resource Title:</label>
           <input type="text" id="resource-title" name="title" placeholder="Enter resource title" required>
@@ -59,10 +72,82 @@
           <label for="resource-description">Description:</label>
           <textarea id="resource-description" name="description" placeholder="Enter a brief description" required></textarea>
         </div>
+        <div class="form-group">
+          <label for="resource-category">Category:</label>
+          <select id="resource-category" name="category" required>
+            <option value="book">Book</option>
+            <option value="article">Article</option>
+            <option value="paper">Research Paper</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="resource-tags">Tags (comma-separated):</label>
+          <input type="text" id="resource-tags" name="tags" placeholder="e.g., science, research, methodology">
+        </div>
         <button type="submit">Add Resource</button>
       </form>
     </section>
   </main>
-  <script src="C:\Users\user\OneDrive\Desktop\bruce li\static\js\lib.js"></script>
+  <script>
+    document.getElementById('search-input').addEventListener('input', debounce(function(e) {
+      const query = e.target.value;
+      if (query.length >= 2) {
+        fetch(`/library/search?q=${encodeURIComponent(query)}`)
+          .then(response => response.json())
+          .then(resources => {
+            updateResourceList(resources);
+          });
+      }
+    }, 300));
+
+    document.getElementById('add-resource-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(this);
+      
+      fetch('/library/add', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('Resource added successfully!');
+          location.reload();
+        } else {
+          alert('Error: ' + data.message);
+        }
+      });
+    });
+
+    function updateResourceList(resources) {
+      const container = document.getElementById('library-items');
+      container.innerHTML = resources.map(resource => `
+        <li class="resource-item">
+          <h3>${resource.title}</h3>
+          <p class="author">By: ${resource.author}</p>
+          <p class="description">${resource.description}</p>
+          ${resource.file_path ? `<a href="${resource.file_path}" class="download-link">Download Resource</a>` : ''}
+          <div class="metadata">
+            <span class="upload-date">Added: ${new Date(resource.upload_date).toLocaleDateString()}</span>
+            <span class="uploader">By: ${resource.uploaded_by}</span>
+          </div>
+        </li>
+      `).join('');
+    }
+
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+  </script>
 </body>
 </html>
