@@ -124,3 +124,10 @@ body {
     border-color: var(--primary-color);
   }
   
+  .btn, button {
+    padding: 12px 20px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    font-weight: 600;
+  }
+  
