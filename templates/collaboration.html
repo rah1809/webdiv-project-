@@ -20,16 +20,21 @@
       <!-- Messages will be dynamically added here -->
     </div>
     <form id="chat-form" class="chat-input-form">
-      <input 
-        type="text" 
-        id="chat-input" 
-        placeholder="Type your message..." 
-        required
-        maxlength="500"
-        aria-label="Chat message">
-      <button type="submit" class="btn btn-primary">
-        Send Message
-      </button>
+      <div class="chat-input-wrapper">
+        <input 
+          type="text" 
+          id="chat-input" 
+          placeholder="Type your message..." 
+          required
+          maxlength="500"
+          aria-label="Chat message">
+        <button type="submit" class="btn btn-send">
+          <span class="btn-text">Send</span>
+          <svg class="send-icon" width="16" height="16" viewBox="0 0 16 16">
+            <path d="M15 2L2 7l4.5 2L12 4l-5.5 7.5L11 13l4-11z"/>
+          </svg>
+        </button>
+      </div>
     </form>
   </section>
 
