@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Collaboration{% endblock %}
+{% block title %}Collaboration Hub{% endblock %}
 
 {% block styles %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/collab.css') }}">
@@ -14,23 +14,31 @@
 </header>
 <main>
   <!-- Chat Section -->
-  <section id="chat-box">
+  <section id="chat-box" class="card">
     <h2>Group Chat</h2>
-    <div id="chat-messages">
+    <div id="chat-messages" class="messages-container">
       <!-- Messages will be dynamically added here -->
     </div>
-    <form id="chat-form">
-      <input type="text" id="chat-input" placeholder="Type your message..." required>
-      <button type="submit">Send</button>
+    <form id="chat-form" class="chat-input-form">
+      <input 
+        type="text" 
+        id="chat-input" 
+        placeholder="Type your message..." 
+        required
+        maxlength="500"
+        aria-label="Chat message">
+      <button type="submit" class="btn btn-primary">
+        Send Message
+      </button>
     </form>
   </section>
 
   <!-- User List Section -->
-  <section id="user-list">
+  <section id="user-list" class="card">
     <h2>Online Researchers</h2>
-    <ul id="online-users">
+    <ul id="online-users" class="user-list">
       {% for user in online_users %}
-        <li>{{ user }}</li>
+        <li class="user-item">{{ user }}</li>
       {% endfor %}
     </ul>
   </section>
