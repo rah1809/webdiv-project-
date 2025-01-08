@@ -44,11 +44,11 @@ header {
 
 main {
   margin: 20px auto;
-  max-width: 400px;
+  max-width: 800px;
   background-color: white;
-  padding: 20px;
-  border-radius: 5px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12pxrgba(0, 0, 0, 0.08);
 }
 
 form .form-group {
@@ -62,9 +62,16 @@ form .form-group label {
 
 form .form-group input {
   width: 100%;
-  padding: 10px;
+  padding: 12px;
   border: 1px solid #ddd;
   border-radius: 5px;
+ transition: border-color 0.3s ease;
+}
+
+form .form-group input:focus {
+ outline: none;
+  border-color: #3e8e41;
+  box-shadow: 0 0 0 2pxrgba(62, 142, 65, 0.1);
 }
 
 form .form-group .forgot-password {
@@ -82,10 +89,12 @@ form button {
   background-color: #3e8e41;
   color: white;
   border: none;
-  padding: 10px 15px;
+  padding: 12px 20px;
   border-radius: 5px;
   cursor: pointer;
   width: 100%;
+ transition: background-color 0.2s ease;
+  font-weight: 600;
 }
 
 form button:hover {
