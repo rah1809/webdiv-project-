@@ -11,15 +11,19 @@ db = Database()
 
 @app.route('/')
 def dashboard():
+    print("dashboard")
     if 'username' not in session:
         return redirect(url_for('login'))
     
     # Get user data from database
     user_data = db.get_user_data(session['username'])
+    print("user_data", user_data)
     # Get user's analyses
     analyses = db.get_user_analyses(session['username'])
+    print("analyses", analyses)
     # Get recent activities or other dashboard data
     recent_activities = db.get_recent_activities(session['username'])
+    print("recent_activities", recent_activities)
     
     return render_template('dashboard.html',
                          user_data=user_data,
