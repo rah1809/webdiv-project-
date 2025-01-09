@@ -56,3 +56,42 @@
     border-radius: 4px;
     background-color: #f0f0f0;
 }
+
+.chat-input-wrapper {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.btn-send {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background-color: var(--primary-color);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-send:hover {
+    background-color: var(--hover-color);
+    transform: translateY(-1px);
+}
+
+.send-icon {
+    fill: currentColor;
+}
+
+/* For mobile responsiveness */
+@media (max-width: 768px) {
+    .btn-text {
+        display: none;
+    }
+    
+    .btn-send {
+        padding: 10px;
+    }
+}
