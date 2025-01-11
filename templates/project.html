@@ -1,0 +1,38 @@
+<div class="project-container">
+    <!-- Project List Section -->
+    <section class="project-list card">
+        <h2>Your Projects</h2>
+        <div class="project-items">
+            {% for project in projects %}
+            <div class="project-card">
+                <h3>{{ project.title }}</h3>
+                <p class="project-description">{{ project.description }}</p>
+                <div class="project-meta">
+                    <span class="project-date">Created: {{ project.created_at }}</span>
+                    <span class="project-status">Status: {{ project.status }}</span>
+                </div>
+                <div class="project-actions">
+                    <button class="btn btn-primary">Edit</button>
+                    <button class="btn btn-danger">Delete</button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Add New Project Section -->
+    <section class="add-project card">
+        <h2>Add New Project</h2>
+        <form class="project-form">
+            <div class="form-group">
+                <label for="project-title">Project Title</label>
+                <input type="text" id="project-title" required>
+            </div>
+            <div class="form-group">
+                <label for="project-description">Description</label>
+                <textarea id="project-description" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Create Project</button>
+        </form>
+    </section>
+</div> 
