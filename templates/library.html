@@ -20,114 +20,14 @@
     </nav>
 
     <!-- Main Content Container -->
-    <div class="container">
-        <header>
-            <h1>Research Library</h1>
-            <p class="subtitle">Manage and access research resources</p>
-        </header>
-
-        <main>
-            <!-- Enhanced Search Section -->
-            <section id="search-bar">
-                <div class="search-wrapper">
-                    <input 
-                        type="text" 
-                        id="search-input" 
-                        placeholder="Search resources by title, author, or tags..."
-                        aria-label="Search resources">
-                    <button type="button" id="search-button" aria-label="Perform search">
-                        <i class="search-icon"></i>
-                    </button>
-                </div>
-                <!-- Advanced Search Filters -->
-                <div class="search-filters">
-                    <select id="category-filter" aria-label="Filter by category">
-                        <option value="">All Categories</option>
-                        <option value="book">Books</option>
-                        <option value="article">Articles</option>
-                        <option value="paper">Research Papers</option>
-                    </select>
-                    <!-- Add date range filter -->
-                    <input type="date" id="date-filter" aria-label="Filter by date">
-                </div>
-            </section>
-
-            <!-- Dynamic Resource List -->
-            <section id="resource-list">
-                <h2>Available Resources</h2>
-                <div class="resource-grid" id="library-items">
-                    {% for resource in resources %}
-                    <article class="resource-item">
-                        <!-- Resource Card Header -->
-                        <div class="resource-header">
-                            <h3>{{ resource.title }}</h3>
-                            <span class="resource-type">{{ resource.category }}</span>
-                        </div>
-                        
-                        <!-- Resource Details -->
-                        <div class="resource-content">
-                            <p class="author">Author: {{ resource.author }}</p>
-                            <p class="description">{{ resource.description }}</p>
-                            {% if resource.tags %}
-                            <div class="tags">
-                                {% for tag in resource.tags %}
-                                <span class="tag">{{ tag }}</span>
-                                {% endfor %}
-                            </div>
-                            {% endif %}
-                        </div>
-
-                        <!-- Resource Actions -->
-                        <div class="resource-actions">
-                            {% if resource.file_path %}
-                            <a href="{{ resource.file_path }}" 
-                               class="download-link"
-                               download>
-                               Download
-                            </a>
-                            {% endif %}
-                            <!-- Add citation button -->
-                            <button class="cite-btn" 
-                                    data-resource-id="{{ resource.id }}">
-                                Cite
-                            </button>
-                        </div>
-
-                        <!-- Resource Metadata -->
-                        <div class="metadata">
-                            <time datetime="{{ resource.upload_date.isoformat() }}">
-                                Added: {{ resource.upload_date.strftime('%Y-%m-%d') }}
-                            </time>
-                            <span class="uploader">By: {{ resource.uploaded_by }}</span>
-                        </div>
-                    </article>
-                    {% endfor %}
-                </div>
-            </section>
-
-            <!-- Resource Upload Form -->
-            <section id="add-resource">
-                <h2>Add New Resource</h2>
-                <form id="add-resource-form" 
-                      enctype="multipart/form-data"
-                      class="resource-form">
-                    <!-- Form fields with improved accessibility -->
-                    <div class="form-group">
-                        <label for="resource-title">Title:</label>
-                        <input type="text" 
-                               id="resource-title" 
-                               name="title" 
-                               required
-                               maxlength="200">
-                    </div>
-                    <!-- ... other form groups ... -->
-                    <div class="form-actions">
-                        <button type="submit">Add Resource</button>
-                        <button type="reset">Clear Form</button>
-                    </div>
-                </form>
-            </section>
-        </main>
+    <div class="library-container">
+        <section class="search-section card">
+            <input type="search" placeholder="Search resources...">
+        </section>
+        
+        <section class="resources-grid">
+            <!-- Add grid layout for resources -->
+        </section>
     </div>
 
     <!-- External JavaScript -->
