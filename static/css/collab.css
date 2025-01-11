@@ -95,3 +95,29 @@
         padding: 10px;
     }
 }
+
+.message {
+    padding: 10px;
+    margin: 5px 0;
+    background-color: #f1f1f1;
+    border-radius: 8px;
+    max-width: 80%;
+}
+
+.messages-container {
+    height: 400px;
+    overflow-y: auto;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.message-content {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.message-time {
+    font-size: 0.8em;
+    color: #666;
+}

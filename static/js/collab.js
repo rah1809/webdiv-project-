@@ -21,21 +21,35 @@ function addMessageToChat(message) {
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
-chatForm.addEventListener('submit', async function (event) {
-    event.preventDefault();
-    const message = chatInput.value.trim();
-    if (message) {
-        const response = await fetch('/api/messages', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ message: message })
-        });
-        const newMessage = await response.json();
-        addMessageToChat(newMessage);
-        chatInput.value = '';
-    }
+document.addEventListener('DOMContentLoaded', function() {
+    const chatForm = document.getElementById('chat-form');
+    const chatInput = document.getElementById('chat-input');
+    const chatMessages = document.getElementById('chat-messages');
+
+    chatForm.addEventListener('submit', function(e) {
+        e.preventDefault(); // Prevent form submission
+
+        const message = chatInput.value.trim();
+        
+        if (message) {
+            // Create message element
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            messageDiv.innerHTML = `
+                <span class="message-content">${message}</span>
+                <span class="message-time">${new Date().toLocaleTimeString()}</span>
+            `;
+            
+            // Add message to chat
+            chatMessages.appendChild(messageDiv);
+            
+            // Clear input
+            chatInput.value = '';
+            
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    });
 });
 
 // Handle online users
