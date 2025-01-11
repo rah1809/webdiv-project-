@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Data Analysis{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/data.css') }}">
+{% endblock %}
+
+{% block nav_title %}data-analysis{% endblock %}
+
+{% block content %}
+<header>
+    <h1>Data Analysis</h1>
+</header>
+<main>
+    <!-- Analysis Form Section -->
+    <section class="analysis-form">
+        <h2 id="form-title">Create New Analysis</h2>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="flash-message">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <form id="analysis-form" method="POST">
+            <div class="form-group">
+                <label for="title">Analysis Title:</label>
+                <input type="text" id="title" name="title" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Description:</label>
+                <textarea id="description" name="description" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="data-type">Data Type:</label>
+                <select id="data-type" name="data_type" required>
+                    <option value="quantitative">Quantitative</option>
+                    <option value="qualitative">Qualitative</option>
+                    <option value="mixed">Mixed Methods</option>
+                </select>
+            </div>
+            <button type="submit" id="submit-btn">Create Analysis</button>
+        </form>
+    </section>
+
+    <!-- Analysis List Section -->
+    <section class="analysis-list">
+        <h2>Your Analyses</h2>
+        {% if analyses %}
+            {% for analysis in analyses %}
+            <div class="analysis-card">
+                <h3>{{ analysis.title }}</h3>
+                <p>{{ analysis.description }}</p>
+                <div class="meta-info">
+                    <span>Type: {{ analysis.data_type }}</span>
+                    <span>Created: {{ analysis.created_at.strftime('%Y-%m-%d') }}</span>
+                    <span>Status: {{ analysis.status }}</span>
+                </div>
+                <div class="actions">
+                    <button class="view-btn" data-id="{{ analysis._id }}">View</button>
+                    <button class="edit-btn" data-id="{{ analysis._id }}">Edit</button>
+                    <button class="delete-btn" data-id="{{ analysis._id }}">Delete</button>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p class="no-data">No analyses found. Create your first analysis above!</p>
+        {% endif %}
+    </section>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/data.js') }}"></script>
+{% endblock %}
+

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="dashboard-container">
+    {% if user_data %}
+    <div class="welcome-section">
+        <h2>Welcome, {{ user_data.full_name or user_data.username }}!</h2>
+    </div>
+    {% endif %}
+
+    {% if analyses %}
+    <div class="analyses-section">
+        <h3>Your Recent Analyses</h3>
+        <div class="analyses-list">
+            {% for analysis in analyses %}
+            <div class="analysis-card">
+                <h4>{{ analysis.title }}</h4>
+                <p>{{ analysis.description }}</p>
+                <span class="date">{{ analysis.created_at }}</span>
+            </div>
+            {% endfor %}
+          </div>
+      </div>
+      {% endif %}
+  
+      {% if recent_activities %}
+      <div class="activities-section">
+          <h3>Recent Activities</h3>
+          <div class="activity-list">
+              {% for activity in recent_activities %}
+              <div class="activity-item">
+                  <span class="activity-type">{{ activity.activity_type }}</span>
+                  <p>{{ activity.description }}</p>
+                  <span class="date">{{ activity.created_at }}</span>
+              </div>
+              {% endfor %}
+          </div>
+      </div>
+      {% endif %}
+  </div>
+  {% endblock %}

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Research Platform{% endblock %}</title>
+  <!-- Add Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  {% block styles %}
+  {% endblock %}
+</head>
+<body>
+  <nav class="nav-menu">
+    <div class="container">
+      <ul class="menu">
+        <li><a href="{{ url_for('home') }}" class="nav-link">Home</a></li>
+        <li><a href="{{ url_for('dashboard') }}" class="nav-link">Dashboard</a></li>
+        <li><a href="{{ url_for('library') }}" class="nav-link">Library</a></li>
+        <li><a href="{{ url_for('collaboration') }}" class="nav-link">Collaboration</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="main-content">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 R&D Platform</p>
+  </footer>
+  {% block scripts %}
+  {% endblock %}
+</body>
+</html>

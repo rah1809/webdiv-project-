@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Meta Tags for Responsive Design -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Research Library Management System</title>
+    <!-- External CSS Link -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/lib.css') }}">
+</head>
+<body>
+    <!-- Global Navigation -->
+    <nav>
+        <ul class="menu">
+            <!-- TODO: Consider using url_for() for all links -->
+            <li><a href="{{ url_for('login') }}">Login Page</a></li>
+            <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+            <!-- ... other navigation items ... -->
+        </ul>
+    </nav>
+
+    <!-- Main Content Container -->
+    <div class="library-container">
+        <section class="search-section card">
+            <input type="search" placeholder="Search resources...">
+        </section>
+        
+        <section class="resources-grid">
+            <!-- Add grid layout for resources -->
+        </section>
+    </div>
+
+    <!-- External JavaScript -->
+    <script src="{{ url_for('static', filename='js/lib.js') }}"></script>
+</body>
+</html>

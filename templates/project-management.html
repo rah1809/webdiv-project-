@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Management</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pm.css') }}">
+</head>
+<body>
+  <nav>
+    <ul class="menu">
+      <li><a href="login.html">Login</a></li>
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="research-profile.html">Research Profile</a></li>
+      <li><a href="group-research.html">Group Research</a></li>
+      <li><a href="project-management.html" class="active">Project Management</a></li>
+      <li><a href="library.html">Library</a></li>
+      <li><a href="data-analysis.html">Data Analysis</a></li>
+      <li><a href="collaboration.html">Collaboration</a></li>
+    </ul>
+  </nav>
+  <header>
+    <h1>Project Management</h1>
+  </header>
+  <main>
+    <section id="current-projects">
+      <h2>Current Projects</h2>
+      <ul id="project-list"></ul>
+    </section>
+    <section id="add-project">
+      <h2>Add a New Project</h2>
+      <form id="add-project-form">
+        <input type="text" id="project-title" placeholder="Project Title" required>
+        <textarea id="project-description" placeholder="Project Description" required></textarea>
+        <button type="submit">Add Project</button>
+      </form>
+    </section>
+  </main>
+  <script src="C:\Users\user\OneDrive\Desktop\bruce li\static\js\pm.java"></script>
+</body>
+</html>

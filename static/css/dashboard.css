@@ -1,0 +1,64 @@
+/* styles.css */
+:root {
+  --primary-color: #3e8e41;
+  --background-color: #f4f4f4;
+  --white: #ffffff;
+  --border-color: #ddd;
+  --hover-bg: #f9f9f9;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: var(--background-color);
+}
+
+header {
+  background-color: var(--primary-color);
+  color: var(--white);
+  padding: 20px;
+  text-align: center;
+}
+
+.dashboard {
+  display: flex;
+  justify-content: space-around;
+  margin: 20px;
+}
+
+.box {
+  background-color: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  padding: 20px;
+  width: 45%;
+  box-shadow: 0 4px 6px var(--shadow-color);
+}
+
+.box h2 {
+  margin-top: 0;
+}
+
+#project-list {
+  list-style: none;
+  padding: 0;
+}
+
+#project-list li {
+  padding: 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+#project-list li:hover {
+  background-color: var(--hover-bg);
+  cursor: pointer;
+}
+
+.card, .box {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  transition: transform 0.2s ease;
+}
+  
