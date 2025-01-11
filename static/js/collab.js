@@ -36,6 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const messageDiv = document.createElement('div');
             messageDiv.className = 'message';
             messageDiv.innerHTML = `
+                <span class="message-username">${currentUser.username}:</span>
                 <span class="message-content">${message}</span>
                 <span class="message-time">${new Date().toLocaleTimeString()}</span>
             `;
@@ -48,6 +49,9 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Scroll to bottom
             chatMessages.scrollTop = chatMessages.scrollHeight;
+        } else {
+            alert("Message cannot be empty!");
+            return;
         }
     });
 });
