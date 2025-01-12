@@ -14,10 +14,14 @@
   <nav class="nav-menu">
     <div class="container">
       <ul class="menu">
-        <li><a href="{{ url_for('home') }}" class="nav-link">Home</a></li>
-        <li><a href="{{ url_for('dashboard') }}" class="nav-link">Dashboard</a></li>
-        <li><a href="{{ url_for('library') }}" class="nav-link">Library</a></li>
-        <li><a href="{{ url_for('collaboration') }}" class="nav-link">Collaboration</a></li>
+        <li><a href="{{ url_for('login') }}">Login</a></li>
+        <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+        <li><a href="{{ url_for('research_profile') }}">Research Profile</a></li>
+        <li><a href="{{ url_for('group_research') }}">Group Research</a></li>
+        <li><a href="{{ url_for('project_management') }}">Project Management</a></li>
+        <li><a href="{{ url_for('library') }}">Library</a></li>
+        <li><a href="{{ url_for('data_analysis') }}">Data Analysis</a></li>
+        <li><a href="{{ url_for('collaboration') }}">Collaboration</a></li>
       </ul>
     </div>
   </nav>

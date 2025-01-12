@@ -44,7 +44,7 @@ body {
 }
 
 .nav-menu a {
-    color: var(--light-text);
+    color: var(--text-light);
     text-decoration: none;
     padding: 0.5rem 1rem;
     transition: all 0.3s ease;
