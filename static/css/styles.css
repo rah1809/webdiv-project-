@@ -1,10 +1,15 @@
 /* Global Variables for consistent colors */
 :root {
-    --bg-primary: #f5f7fa;
-    --nav-bg: #2c3e50;
-    --nav-hover: #34495e;
-    --text-primary: #2c3e50;
-    --text-light: #ffffff;
+    --primary-color: #2196F3;
+    --secondary-color: #4CAF50;
+    --accent-color: #FF9800;
+    --danger-color: #f44336;
+    --text-color: #333333;
+    --light-text: #ffffff;
+    --background-color: #f5f5f5;
+    --card-background: #ffffff;
+    --border-color: #e0e0e0;
+    --hover-color: #1976D2;
 }
 
 /* Base Styles */
@@ -44,7 +49,7 @@ body {
 }
 
 .nav-menu a {
-    color: var(--text-light);
+    color: var(--light-text);
     text-decoration: none;
     padding: 0.5rem 1rem;
     transition: all 0.3s ease;
