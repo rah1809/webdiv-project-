@@ -642,3 +642,11 @@ class Database:
         except Exception as e:
             print(f"Error getting projects: {e}")
             return []
+
+    def get_library_resource(self, resource_id):
+        """Get a single library resource by ID"""
+        try:
+            return self.db.library.find_one({'_id': ObjectId(resource_id)})
+        except Exception as e:
+            print(f"Error retrieving library resource: {e}")
+            return None

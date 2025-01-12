@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from db import Database
 import os
 from werkzeug.utils import secure_filename
+from datetime import datetime
 
 app = Flask(__name__,
             template_folder='templates',
@@ -503,6 +504,53 @@ def test_db():
             'status': 'error',
             'message': f'Database connection failed: {str(e)}'
         }), 500
+
+@app.route('/library/cite/<resource_id>')
+def get_citation(resource_id):
+    if 'username' not in session:
+        return jsonify({'success': False, 'message': 'Not logged in'})
+    
+    try:
+        resource = db.get_library_resource(resource_id)
+        if not resource:
+            return jsonify({'success': False, 'message': 'Resource not found'})
+        
+        # Format citation in APA style
+        # Author. (Year). Title. Publisher. URL
+        citation = ""
+        
+        # Add authors
+        if resource.get('author'):
+            citation += f"{resource['author']}. "
+        
+        # Add date in parentheses
+        pub_date = resource.get('publication_date', resource.get('upload_date'))
+        if pub_date:
+            year = pub_date.year if isinstance(pub_date, datetime) else 'n.d.'
+            citation += f"({year}). "
+        
+        # Add title
+        if resource.get('title'):
+            citation += f"{resource['title']}. "
+        
+        # Add publisher
+        if resource.get('publisher'):
+            citation += f"{resource['publisher']}. "
+        
+        # Add URL if available
+        if resource.get('url'):
+            citation += f"Retrieved from {resource['url']}"
+        
+        return jsonify({
+            'success': True,
+            'citation': citation.strip()
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error generating citation: {str(e)}'
+        })
 
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=False)

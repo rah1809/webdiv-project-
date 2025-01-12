@@ -131,5 +131,34 @@
 
     <!-- External JavaScript -->
     <script src="{{ url_for('static', filename='js/lib.js') }}"></script>
+    <script>
+    document.querySelectorAll('.cite-btn').forEach(button => {
+        button.addEventListener('click', async function() {
+            const resourceId = this.dataset.resourceId;
+            try {
+                const response = await fetch(`/library/cite/${resourceId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Create a temporary textarea to copy the citation
+                    const textarea = document.createElement('textarea');
+                    textarea.value = data.citation;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    
+                    // Show success message
+                    alert('Citation copied to clipboard:\n\n' + data.citation);
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (error) {
+                alert('Error generating citation');
+                console.error('Error:', error);
+            }
+        });
+    });
+    </script>
 </body>
 </html>
