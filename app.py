@@ -288,18 +288,11 @@ def research_profile():
     
     if request.method == 'POST':
         profile_data = {
-            'full_name': request.form.get('full_name'),
+         
             'student_id': request.form.get('student_id'),
-            'email': request.form.get('email'),
-            'phone': request.form.get('phone'),
-            'university': request.form.get('university'),
             'department': request.form.get('department'),
-            'position': request.form.get('position'),
-            'specialization': request.form.get('specialization'),
-            'research_areas': request.form.getlist('research_areas'),
             'research_interests': request.form.getlist('research_interests'),
-            'thesis_topic': request.form.get('thesis_topic'),
-            'current_projects': request.form.getlist('current_projects')
+
         }
         
         success, message = db.create_researcher_profile(session['username'], profile_data)
@@ -307,7 +300,7 @@ def research_profile():
             flash('Profile updated successfully!')
         else:
             flash('Error updating profile: ' + message)
-        
+    
         return redirect(url_for('research_profile'))
     
     # Get existing profile data
