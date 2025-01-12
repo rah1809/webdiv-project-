@@ -504,13 +504,13 @@ class Database:
         return result.modified_count > 0
 
     def create_researcher_profile(self, username, profile_data):
-        """Create or update a researcher profile"""
+        """Create or update researcher profile"""
         try:
             profile = {
                 'username': username,
                 'personal_info': {
                     'full_name': profile_data.get('full_name'),
-                    'student_id': profile_data.get('student_id'),
+                    'researcher_id': profile_data.get('researcher_id'),
                     'email': profile_data.get('email'),
                     'phone': profile_data.get('phone'),
                     'profile_picture': profile_data.get('profile_picture')
@@ -518,22 +518,23 @@ class Database:
                 'academic_info': {
                     'university': profile_data.get('university'),
                     'department': profile_data.get('department'),
-                    'position': profile_data.get('position'),
+                    'academic_position': profile_data.get('academic_position'),
+                    'research_group': profile_data.get('research_group'),
                     'specialization': profile_data.get('specialization'),
                     'research_areas': profile_data.get('research_areas', [])
                 },
                 'research_work': {
-                    'current_projects': profile_data.get('current_projects', []),
+                    'current_projects': profile_data.get('projects', []),
                     'publications': profile_data.get('publications', []),
                     'research_interests': profile_data.get('research_interests', []),
-                    'thesis_topic': profile_data.get('thesis_topic')
+                    'research_topic': profile_data.get('research_topic')
                 },
                 'education': profile_data.get('education', []),
                 'achievements': profile_data.get('achievements', []),
                 'updated_at': datetime.utcnow()
             }
             
-            result = self.db['ResearcherProfiles'].update_one(
+            result = self.db.researcher_profiles.update_one(
                 {'username': username},
                 {'$set': profile},
                 upsert=True
@@ -543,9 +544,9 @@ class Database:
             return False, str(e)
 
     def get_researcher_profile(self, username):
-        """Get researcher profile by username"""
+        """Get researcher profile data"""
         try:
-            return self.db['ResearcherProfiles'].find_one({'username': username})
+            return self.db.researcher_profiles.find_one({'username': username})
         except Exception as e:
             print(f"Error retrieving researcher profile: {e}")
             return None
@@ -631,4 +632,13 @@ class Database:
             }))
         except Exception as e:
             print(f"Error searching resources: {e}")
+            return []
+
+    def get_available_projects(self):
+        """Get list of all available projects"""
+        try:
+            projects = self.db.projects.find({}, {'_id': 1, 'title': 1})
+            return list(projects)
+        except Exception as e:
+            print(f"Error getting projects: {e}")
             return []

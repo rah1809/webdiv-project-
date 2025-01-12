@@ -1,47 +1,60 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Research Profile</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/re.css') }}">
-</head>
-<body>
-      <!-- Navigation Menu -->
-         <nav>
-             <ul class="menu">
-                 <li><a href="login.html">Login Page</a></li>
-                 <li><a href="dashboard.html">Dashboard</a></li>
-                 <li><a href="research-profile.html">Research Profile</a></li>
-                 <li><a href="group-research.html">Group Research</a></li>
-                 <li><a href="project-management.html">Project Management</a></li>
-                 <li><a href="library.html">Library</a></li>
-                 <li><a href="data-analysis.html">Data Analysis</a></li>
-                 <li><a href="collaboration.html">Collaboration</a></li>
-             </ul>
-         </nav>
+{% extends "base.html" %}
 
+{% block content %}
   <!-- Research Profile Section -->
   <header>
-    <h1>Research Profile</h1>
+    <h1>Researcher Profile</h1>
   </header>
   <main>
-    <form id="research-profile-form">
+    <form id="research-profile-form" method="POST" action="{{ url_for('research_profile') }}">
       <div class="form-group">
-        <label for="student-id">Student ID:</label>
-        <input type="text" id="student-id" name="studentId" placeholder="Enter your student ID" required>
+        <label for="researcher-id">Researcher ID:</label>
+        <input type="text" id="researcher-id" name="researcher_id" placeholder="Enter your researcher ID" required>
       </div>
+
       <div class="form-group">
-        <label for="university">University Details:</label>
-        <input type="text" id="university" name="university" placeholder="Enter your university name" required>
+        <label for="academic-position">Academic Position:</label>
+        <select id="academic-position" name="academic_position" required>
+          <option value="" disabled selected>Select your position</option>
+          <option value="undergraduate">Undergraduate</option>
+          <option value="masters">Master Student</option>
+          <option value="phd">PhD Student</option>
+          <option value="postdoc">Postdoc</option>
+          <option value="professor">Professor</option>
+        </select>
       </div>
+
+      <div class="form-group">
+        <label for="research-group">Research Group:</label>
+        <select id="research-group" name="research_group" required>
+          <option value="" disabled selected>Select your research group</option>
+          <option value="group1">Artificial Intelligence and Machine Learning</option>
+          <option value="group2">Quantum Computing Research</option>
+          <option value="group3">Biomedical Engineering Innovation</option>
+          <option value="group4">Sustainable Energy Systems</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="projects">Current Projects:</label>
+        <select id="projects" name="projects" multiple>
+          {% for project in projects %}
+            <option value="{{ project.id }}">{{ project.title }}</option>
+          {% endfor %}
+        </select>
+        <small>Hold Ctrl (Cmd on Mac) to select multiple projects</small>
+      </div>
+
       <div class="form-group">
         <label for="research-topic">Research Topic:</label>
-        <textarea id="research-topic" name="researchTopic" placeholder="Describe your research topic" required></textarea>
+        <textarea id="research-topic" name="research_topic" placeholder="Describe your research topic" required></textarea>
       </div>
+
       <button type="submit">Save Profile</button>
     </form>
   </main>
-  <script src="C:\Users\user\OneDrive\Desktop\bruce li\static\js\re.js"></script>
-</body>
-</html>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/re.js') }}"></script>
+{% endblock %}

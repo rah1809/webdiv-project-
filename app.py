@@ -10,6 +10,13 @@ app.secret_key = os.urandom(24)  # Required for session management
 db = Database()
 
 @app.route('/')
+@app.route('/login')
+def login():
+    if 'username' in session:
+        return redirect(url_for('dashboard'))
+    return render_template('login.html')
+
+@app.route('/dashboard')
 def dashboard():
     print("dashboard")
     if 'username' not in session:
@@ -151,10 +158,6 @@ def add_library_resource():
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)})
 
-@app.route('/login')
-def login():
-    return render_template('login.html')
-
 @app.route('/login_post', methods=['GET', 'POST'])
 def login_post():
     if request.method == 'POST':
@@ -281,18 +284,18 @@ def update_project_status(project_id):
     success = db.update_project_status(project_id, status)
     return jsonify({'success': success})
 
-@app.route('/research-profile.html', methods=['GET', 'POST'])
+@app.route('/research-profile', methods=['GET', 'POST'])
 def research_profile():
     if 'username' not in session:
         return redirect(url_for('login'))
     
     if request.method == 'POST':
         profile_data = {
-         
-            'student_id': request.form.get('student_id'),
-            'department': request.form.get('department'),
-            'research_interests': request.form.getlist('research_interests'),
-
+            'researcher_id': request.form.get('researcher_id'),
+            'academic_position': request.form.get('academic_position'),
+            'research_group': request.form.get('research_group'),
+            'projects': request.form.getlist('projects'),
+            'research_topic': request.form.get('research_topic')
         }
         
         success, message = db.create_researcher_profile(session['username'], profile_data)
@@ -303,9 +306,11 @@ def research_profile():
     
         return redirect(url_for('research_profile'))
     
-    # Get existing profile data
+    # Get existing profile data and projects list
     profile = db.get_researcher_profile(session['username'])
-    return render_template('research-profile.html', profile=profile)
+    projects = db.get_available_projects()  # You'll need to implement this in your Database class
+    
+    return render_template('research-profile.html', profile=profile, projects=projects)
 
 @app.route('/add-education', methods=['POST'])
 def add_education():
