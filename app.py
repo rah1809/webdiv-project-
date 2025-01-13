@@ -573,5 +573,14 @@ def get_citation(resource_id):
             'message': f'Error generating citation: {str(e)}'
         })
 
+@app.route('/search-researchers')
+def search_researchers():
+    if 'username' not in session:
+        return jsonify({'success': False, 'message': 'Not logged in'})
+    
+    query = request.args.get('q', '')
+    researchers = db.search_researchers(query)
+    return jsonify(researchers)
+
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=False)

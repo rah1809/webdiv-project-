@@ -650,3 +650,20 @@ class Database:
         except Exception as e:
             print(f"Error retrieving library resource: {e}")
             return None
+
+    def search_researchers(self, query):
+        """Search researchers by ID or name"""
+        try:
+            return list(self.db.researcher_profiles.find({
+                '$or': [
+                    {'personal_info.researcher_id': {'$regex': query, '$options': 'i'}},
+                    {'personal_info.full_name': {'$regex': query, '$options': 'i'}}
+                ]
+            }, {
+                'personal_info.researcher_id': 1,
+                'personal_info.full_name': 1,
+                'academic_info.academic_position': 1
+            }))
+        except Exception as e:
+            print(f"Error searching researchers: {e}")
+            return []

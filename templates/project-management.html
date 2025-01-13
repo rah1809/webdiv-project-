@@ -32,6 +32,21 @@
       <form id="add-project-form">
         <input type="text" id="project-title" placeholder="Project Title" required>
         <textarea id="project-description" placeholder="Project Description" required></textarea>
+        
+        <!-- Add participant search section -->
+        <div class="participant-search">
+          <label for="participant-search">Add Participants:</label>
+          <div class="search-container">
+            <input type="text" 
+                   id="participant-search" 
+                   placeholder="Search by researcher ID or name"
+                   autocomplete="off">
+            <div id="search-results" class="dropdown-content"></div>
+          </div>
+          <div id="selected-participants" class="selected-list"></div>
+          <input type="hidden" id="participant-ids" name="participant_ids">
+        </div>
+
         <button type="submit">Add Project</button>
       </form>
     </section>
