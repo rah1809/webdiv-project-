@@ -182,14 +182,14 @@ class Database:
         except:
             return []
 
-    def add_analysis(self, username, title, description, data_type, results=None):
+    def add_analysis(self, username, title, description, data_type, file_path=None):
         """Add a new data analysis entry"""
         analysis = {
             'username': username,
             'title': title,
             'description': description,
             'data_type': data_type,
-            'results': results,
+            'file_path': file_path,  # Add file path
             'created_at': datetime.utcnow(),
             'updated_at': datetime.utcnow(),
             'status': 'pending'

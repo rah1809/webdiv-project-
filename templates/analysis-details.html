@@ -36,9 +36,9 @@
     </div>
 
     <div class="analysis-actions">
-        <button onclick="shareAnalysis('{{ analysis._id }}')">Share Analysis</button>
-        <button onclick="exportAnalysis('{{ analysis._id }}')">Export Data</button>
-        <button onclick="window.location.href='{{ url_for('data_analysis') }}'">Back to List</button>
+        <button onclick="shareAnalysis('{{ analysis._id }}');">Share Analysis</button>
+        <button onclick="exportAnalysis('{{ analysis._id }}');">Export Data</button>
+        <button onclick="window.location.href='{{ url_for('data_analysis') }}';">Back to List</button>
     </div>
 </div>
 {% endblock %}

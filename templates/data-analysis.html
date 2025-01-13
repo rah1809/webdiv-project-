@@ -10,7 +10,7 @@
 
 {% block content %}
 <header>
-    <h1>Data Analysis</h1>
+    <h1>Data Analysis Storage</h1>
 </header>
 <main>
     <!-- Analysis Form Section -->
@@ -23,7 +23,7 @@
                 {% endfor %}
             {% endif %}
         {% endwith %}
-        <form id="analysis-form" method="POST">
+        <form id="analysis-form" method="POST" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="title">Analysis Title:</label>
                 <input type="text" id="title" name="title" required>
@@ -39,6 +39,15 @@
                     <option value="qualitative">Qualitative</option>
                     <option value="mixed">Mixed Methods</option>
                 </select>
+            </div>
+            <div class="form-group">
+                <label for="data-file">Data File:</label>
+                <input type="file" 
+                       id="data-file" 
+                       name="data_file" 
+                       accept=".csv,.xlsx,.json,.txt"
+                       required>
+                <small class="file-help">Supported formats: CSV, Excel, JSON, TXT (max 10MB)</small>
             </div>
             <button type="submit" id="submit-btn">Create Analysis</button>
         </form>

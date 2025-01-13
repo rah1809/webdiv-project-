@@ -54,26 +54,47 @@ def data_analysis():
         description = request.form.get('description')
         data_type = request.form.get('data_type')
         
-        try:
-            analysis_id = db.add_analysis(
-                username=session['username'],
-                title=title,
-                description=description,
-                data_type=data_type
-            )
+        # Handle file upload
+        if 'data_file' not in request.files:
+            flash('No file uploaded')
+            return redirect(request.url)
             
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return jsonify({'success': True, 'analysis_id': analysis_id})
-            else:
-                flash('Analysis created successfully!')
-                return redirect(url_for('data_analysis'))
+        file = request.files['data_file']
+        if file.filename == '':
+            flash('No file selected')
+            return redirect(request.url)
+            
+        if file:
+            # Create uploads directory if it doesn't exist
+            upload_dir = os.path.join('static', 'uploads', 'analysis')
+            os.makedirs(upload_dir, exist_ok=True)
+            
+            # Secure the filename and save the file
+            filename = secure_filename(file.filename)
+            file_path = os.path.join(upload_dir, filename)
+            file.save(file_path)
+            
+            try:
+                analysis_id = db.add_analysis(
+                    username=session['username'],
+                    title=title,
+                    description=description,
+                    data_type=data_type,
+                    file_path=file_path
+                )
                 
-        except Exception as e:
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return jsonify({'success': False, 'message': str(e)})
-            else:
-                flash('Error creating analysis: ' + str(e))
-                return redirect(url_for('data_analysis'))
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return jsonify({'success': True, 'analysis_id': analysis_id})
+                else:
+                    flash('Analysis created successfully!')
+                    return redirect(url_for('data_analysis'))
+                    
+            except Exception as e:
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return jsonify({'success': False, 'message': str(e)})
+                else:
+                    flash('Error creating analysis: ' + str(e))
+                    return redirect(url_for('data_analysis'))
 
     # Get user's analyses for display
     analyses = db.get_user_analyses(session['username'])
