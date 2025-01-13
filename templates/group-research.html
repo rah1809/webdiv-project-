@@ -50,14 +50,15 @@
     <section id="document-section">
       <h2>Document Sharing</h2>
       <form id="document-form">
-        <input type="file" id="file-upload" accept=".pdf, .docx, .pptx" required>
-        <button type="submit">Upload</button>
+        <input type="file" id="file-upload" multiple required>
+        <div id="file-list" class="file-preview"></div>
+        <button type="submit">Upload Files</button>
       </form>
       <div id="documents">
         <!-- Uploaded document links will appear here -->
       </div>
     </section>
   </main>
-  <script src="C:\Users\user\OneDrive\Desktop\bruce li\static\js\gr.js"></script>
+  <script src="{{ url_for('static', filename='js/gr.js') }}"></script>
 </body>
 </html>
