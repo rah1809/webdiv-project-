@@ -48,11 +48,11 @@
 <script src="{{ url_for('static', filename='js/data.js') }}"></script>
 <script>
 function shareAnalysis(analysisId) {
-    window.location.href = `/data-analysis/share/${analysisId}`;
+    window.location.href = "{{ url_for('share_analysis', analysis_id='') }}" + analysisId;
 }
 
 function exportAnalysis(analysisId) {
-    fetch(`/data-analysis/export/${analysisId}`)
+    fetch("{{ url_for('export_analysis', analysis_id='') }}" + analysisId)
         .then(response => response.json())
         .then(data => {
             // Create and download export file
