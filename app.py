@@ -44,7 +44,7 @@ def collaboration():
     online_users = db.get_online_users()
     return render_template('collaboration.html', online_users=online_users)
 
-@app.route('/data-analysis.html', methods=['GET', 'POST'])
+@app.route('/data-analysis', methods=['GET', 'POST'])
 def data_analysis():
     if 'username' not in session:
         return redirect(url_for('login'))
@@ -56,25 +56,32 @@ def data_analysis():
         
         # Handle file upload
         if 'data_file' not in request.files:
-            flash('No file uploaded')
+            message = 'No file uploaded'
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return jsonify({'success': False, 'message': message})
+            flash(message)
             return redirect(request.url)
             
         file = request.files['data_file']
         if file.filename == '':
-            flash('No file selected')
+            message = 'No file selected'
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return jsonify({'success': False, 'message': message})
+            flash(message)
             return redirect(request.url)
             
         if file:
-            # Create uploads directory if it doesn't exist
-            upload_dir = os.path.join('static', 'uploads', 'analysis')
-            os.makedirs(upload_dir, exist_ok=True)
-            
-            # Secure the filename and save the file
-            filename = secure_filename(file.filename)
-            file_path = os.path.join(upload_dir, filename)
-            file.save(file_path)
-            
             try:
+                # Create uploads directory if it doesn't exist
+                upload_dir = os.path.join('static', 'uploads', 'analysis')
+                os.makedirs(upload_dir, exist_ok=True)
+                
+                # Secure the filename and save the file
+                filename = secure_filename(file.filename)
+                file_path = os.path.join(upload_dir, filename)
+                file.save(file_path)
+                
+                # Add to database
                 analysis_id = db.add_analysis(
                     username=session['username'],
                     title=title,
@@ -83,18 +90,23 @@ def data_analysis():
                     file_path=file_path
                 )
                 
+                message = 'Analysis created successfully!'
                 if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                    return jsonify({'success': True, 'analysis_id': analysis_id})
-                else:
-                    flash('Analysis created successfully!')
-                    return redirect(url_for('data_analysis'))
+                    return jsonify({
+                        'success': True,
+                        'message': message,
+                        'analysis_id': analysis_id
+                    })
+                    
+                flash(message)
+                return redirect(url_for('data_analysis'))
                     
             except Exception as e:
+                message = f'Error creating analysis: {str(e)}'
                 if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                    return jsonify({'success': False, 'message': str(e)})
-                else:
-                    flash('Error creating analysis: ' + str(e))
-                    return redirect(url_for('data_analysis'))
+                    return jsonify({'success': False, 'message': message})
+                flash(message)
+                return redirect(url_for('data_analysis'))
 
     # Get user's analyses for display
     analyses = db.get_user_analyses(session['username'])

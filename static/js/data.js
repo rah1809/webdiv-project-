@@ -5,35 +5,38 @@ document.addEventListener('DOMContentLoaded', function() {
     if (analysisForm) {
         analysisForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            submitAnalysis();
+            
+            const formData = new FormData(analysisForm);
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Uploading...';
+            
+            fetch('/data-analysis', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showMessage('Analysis created successfully!', 'success');
+                    location.reload();
+                } else {
+                    showMessage(data.message || 'Error creating analysis', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showMessage('Failed to create analysis', 'error');
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create Analysis';
+            });
         });
     }
 
     // Initialize analysis actions
     setupAnalysisActions();
-
-    // Function to submit analysis
-    function submitAnalysis() {
-        const formData = new FormData(analysisForm);
-        
-        fetch('/data-analysis.html', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showMessage('Analysis created successfully!', 'success');
-                location.reload(); // Reload to show new analysis
-            } else {
-                showMessage(data.message || 'Error creating analysis', 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showMessage('Failed to create analysis', 'error');
-        });
-    }
 
     // Function to handle analysis actions
     function setupAnalysisActions() {
@@ -74,11 +77,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('data-type').value = data.data_type;
                 
                 // Show edit form
-                document.getElementById('analysis-form').style.display = 'block';
                 document.getElementById('form-title').textContent = 'Edit Analysis';
                 document.getElementById('submit-btn').textContent = 'Update';
+                // Add analysis ID to form
+                const idInput = document.createElement('input');
+                idInput.type = 'hidden';
+                idInput.name = 'analysis_id';
+                idInput.value = analysisId;
+                analysisForm.appendChild(idInput);
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => {
+                console.error('Error:', error);
+                showMessage('Failed to load analysis details', 'error');
+            });
     }
 
     // Function to delete analysis
