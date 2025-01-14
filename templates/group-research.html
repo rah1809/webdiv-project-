@@ -10,14 +10,14 @@
   <!-- Navigation Menu -->
   <nav>
     <ul class="menu">
-      <li><a href="login.html">Login Page</a></li>
-      <li><a href="dashboard.html">Dashboard</a></li>
-      <li><a href="research-profile.html">Research Profile</a></li>
-      <li><a href="group-research.html" class="active">Group Research</a></li>
-      <li><a href="project-management.html">Project Management</a></li>
-      <li><a href="library.html">Library</a></li>
-      <li><a href="data-analysis.html">Data Analysis</a></li>
-      <li><a href="collaboration.html">Collaboration</a></li>
+      <li><a href="{{ url_for('login') }}">Login Page</a></li>
+      <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+      <li><a href="{{ url_for('research_profile') }}">Research Profile</a></li>
+      <li><a href="{{ url_for('group_research') }}" class="active">Group Research</a></li>
+      <li><a href="{{ url_for('project_management') }}">Project Management</a></li>
+      <li><a href="{{ url_for('library') }}">Library</a></li>
+      <li><a href="{{ url_for('data_analysis') }}">Data Analysis</a></li>
+      <li><a href="{{ url_for('collaboration') }}">Collaboration</a></li>
     </ul>
   </nav>
 

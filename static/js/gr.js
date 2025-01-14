@@ -38,14 +38,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const validateFiles = (files) => {
         const maxSize = 10 * 1024 * 1024; // 10MB
-        const validTypes = ['application/pdf', 'application/msword', 'text/plain', 'application/vnd.ms-excel'];
+        const validMimeTypes = [
+            'application/pdf',
+            'application/x-pdf',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+            'text/plain',
+            'application/vnd.ms-excel',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' // .xlsx
+        ];
+        
+        const validExtensions = ['.pdf', '.doc', '.docx', '.txt', '.xls', '.xlsx'];
         
         for (const file of files) {
             if (file.size > maxSize) {
                 throw new Error(`File ${file.name} is too large. Maximum size is 10MB`);
             }
-            if (!validTypes.includes(file.type)) {
-                throw new Error(`File ${file.name} has invalid type. Allowed types: PDF, DOC, TXT, XLS`);
+            
+            // Check both MIME type and file extension
+            const fileExtension = file.name.toLowerCase().substring(file.name.lastIndexOf('.'));
+            if (!validMimeTypes.includes(file.type) && !validExtensions.includes(fileExtension)) {
+                throw new Error(`File ${file.name} has invalid type. Allowed types: PDF, DOC, DOCX, TXT, XLS, XLSX`);
             }
         }
     };

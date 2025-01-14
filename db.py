@@ -9,7 +9,10 @@ class Database:
     def __init__(self):
         try:
             # Create a MongoDB client
-            self.client = MongoClient('mongodb://localhost:27017/')
+            self.client = MongoClient('mongodb://localhost:27017/', serverSelectionTimeoutMS=5000)
+            
+            # Test connection
+            self.client.admin.command('ping')
             
             # Connect to the ResearchDB database
             self.db = self.client['ResearchDB']
@@ -21,20 +24,41 @@ class Database:
                 'data_analysis': self.db['DataAnalysis'],
                 'research_groups': self.db['ResearchGroups'],
                 'online_users': self.db['OnlineUsers'],
-                'library': self.db['Library']
+                'library': self.db['Library'],
+                'projects': self.db['Projects'],
+                'chat_messages': self.db['ChatMessages']  # Add chat messages collection
             }
             
             # Create direct references for commonly used collections
             self.login_collection = self.collections['login']
             self.user_profiles = self.collections['user_profiles']
+            self.projects_collection = self.collections['projects']
             
-            # Test connection
-            self.client.admin.command('ping')
             print(f"Successfully connected to MongoDB. Database: {self.db.name}")
+            
+            # Create indexes
+            self._create_indexes()
             
         except Exception as e:
             print(f"Database connection error: {e}")
-            raise
+            print("Please ensure MongoDB is installed and running.")
+            print("On macOS, use: brew services start mongodb-community")
+            # Don't raise the error, allow the application to start without DB
+            self.client = None
+            self.db = None
+            self.collections = {}
+            self.login_collection = None
+            self.user_profiles = None
+            self.projects_collection = None
+
+    def is_connected(self):
+        """Check if database is connected"""
+        return self.client is not None
+
+    def ensure_connected(self):
+        """Ensure database is connected before operations"""
+        if not self.is_connected():
+            raise Exception("Database is not connected. Please ensure MongoDB is running.")
 
     def _create_indexes(self):
         """Create necessary indexes for better performance"""
@@ -748,3 +772,144 @@ class Database:
         self.db.password_resets.delete_many({
             'expiry': {'$lt': datetime.utcnow()}
         })
+
+    def get_user_projects(self, username):
+        """Get all projects associated with a user (either as creator or team member)"""
+        try:
+            self.ensure_connected()
+            return list(self.projects_collection.find({
+                '$or': [
+                    {'created_by': username},  # Match the field name used in create_project
+                    {'team_members': username}
+                ]
+            }).sort('created_at', -1))
+        except Exception as e:
+            print(f"Error retrieving user projects: {e}")
+            return []
+
+    def create_project(self, project_data):
+        """Create a new project"""
+        try:
+            self.ensure_connected()
+            # Ensure created_by field is set
+            if 'created_by' not in project_data and 'creator' in project_data:
+                project_data['created_by'] = project_data.pop('creator')
+            
+            project_data['created_at'] = datetime.utcnow()
+            project_data['updated_at'] = datetime.utcnow()
+            result = self.projects_collection.insert_one(project_data)
+            return str(result.inserted_id), "Project created successfully"
+        except Exception as e:
+            print(f"Error creating project: {e}")
+            return None, f"Error creating project: {str(e)}"
+
+    def get_project(self, project_id):
+        """Get project by ID"""
+        try:
+            return self.db['projects'].find_one({'_id': ObjectId(project_id)})
+        except Exception as e:
+            print(f"Error retrieving project: {e}")
+            return None
+
+    def update_project(self, project_id, update_data):
+        """Update project details"""
+        try:
+            update_data['updated_at'] = datetime.utcnow()
+            result = self.db['projects'].update_one(
+                {'_id': ObjectId(project_id)},
+                {'$set': update_data}
+            )
+            return result.modified_count > 0, "Project updated successfully"
+        except Exception as e:
+            return False, f"Error updating project: {str(e)}"
+
+    def update_project_status(self, project_id, status):
+        """Update project status"""
+        try:
+            result = self.db['projects'].update_one(
+                {'_id': ObjectId(project_id)},
+                {
+                    '$set': {
+                        'status': status,
+                        'updated_at': datetime.utcnow()
+                    }
+                }
+            )
+            return result.modified_count > 0
+        except Exception as e:
+            print(f"Error updating project status: {e}")
+            return False
+
+    def add_project_task(self, project_id, task_data):
+        """Add a task to a project"""
+        try:
+            task = {
+                'title': task_data.get('title'),
+                'description': task_data.get('description'),
+                'assigned_to': task_data.get('assigned_to'),
+                'due_date': task_data.get('due_date'),
+                'priority': task_data.get('priority'),
+                'status': 'pending',
+                'created_at': datetime.utcnow()
+            }
+            
+            result = self.db['projects'].update_one(
+                {'_id': ObjectId(project_id)},
+                {
+                    '$push': {'tasks': task},
+                    '$set': {'updated_at': datetime.utcnow()}
+                }
+            )
+            return result.modified_count > 0
+        except Exception as e:
+            print(f"Error adding project task: {e}")
+            return False
+
+    def add_chat_message(self, message_data):
+        """Add a new chat message"""
+        try:
+            message = {
+                'text': message_data.get('text'),
+                'username': message_data.get('username'),
+                'timestamp': message_data.get('timestamp', datetime.utcnow()),
+                'is_deleted': False
+            }
+            
+            result = self.collections['chat_messages'].insert_one(message)
+            return str(result.inserted_id)
+        except Exception as e:
+            print(f"Error adding chat message: {e}")
+            return None
+
+    def get_chat_messages(self, limit=50):
+        """Get recent chat messages"""
+        try:
+            messages = list(self.collections['chat_messages']
+                          .find({'is_deleted': False})
+                          .sort('timestamp', -1)
+                          .limit(limit))
+            
+            # Convert ObjectId to string for JSON serialization
+            for message in messages:
+                message['_id'] = str(message['_id'])
+                message['timestamp'] = message['timestamp'].isoformat()
+            
+            return messages[::-1]  # Reverse to get chronological order
+        except Exception as e:
+            print(f"Error retrieving chat messages: {e}")
+            return []
+
+    def delete_chat_message(self, message_id, username):
+        """Soft delete a chat message"""
+        try:
+            result = self.collections['chat_messages'].update_one(
+                {
+                    '_id': ObjectId(message_id),
+                    'username': username  # Only allow deletion by the message author
+                },
+                {'$set': {'is_deleted': True}}
+            )
+            return result.modified_count > 0
+        except Exception as e:
+            print(f"Error deleting chat message: {e}")
+            return False

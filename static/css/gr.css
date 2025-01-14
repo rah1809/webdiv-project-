@@ -1,4 +1,17 @@
 /* styles.css */
+:root {
+  --primary-color: #2196F3;
+  --secondary-color: #4CAF50;
+  --accent-color: #FF9800;
+  --danger-color: #f44336;
+  --text-color: #333333;
+  --light-text: #ffffff;
+  --background-color: #0b740e;
+  --card-background: #038803;
+  --border-color: #1f9607;
+  --hover-color: #1976D2;
+}
+
 body {
     font-family: Arial, sans-serif;
     margin: 0;

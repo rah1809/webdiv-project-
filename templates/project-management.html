@@ -9,14 +9,14 @@
 <body>
   <nav>
     <ul class="menu">
-      <li><a href="login.html">Login</a></li>
-      <li><a href="dashboard.html">Dashboard</a></li>
-      <li><a href="research-profile.html">Research Profile</a></li>
-      <li><a href="group-research.html">Group Research</a></li>
-      <li><a href="project-management.html" class="active">Project Management</a></li>
-      <li><a href="library.html">Library</a></li>
-      <li><a href="data-analysis.html">Data Analysis</a></li>
-      <li><a href="collaboration.html">Collaboration</a></li>
+      <li><a href="{{ url_for('login') }}">Login</a></li>
+      <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+      <li><a href="{{ url_for('research_profile') }}">Research Profile</a></li>
+      <li><a href="{{ url_for('group_research') }}">Group Research</a></li>
+      <li><a href="{{ url_for('project_management') }}" class="active">Project Management</a></li>
+      <li><a href="{{ url_for('library') }}">Library</a></li>
+      <li><a href="{{ url_for('data_analysis') }}">Data Analysis</a></li>
+      <li><a href="{{ url_for('collaboration') }}">Collaboration</a></li>
     </ul>
   </nav>
   <header>
@@ -25,17 +25,65 @@
   <main>
     <section id="current-projects">
       <h2>Current Projects</h2>
-      <ul id="project-list"></ul>
+      {% if projects %}
+        <ul id="project-list">
+          {% for project in projects %}
+            <li class="project-item">
+              <h3>{{ project.title }}</h3>
+              <p>{{ project.description }}</p>
+              <div class="project-details">
+                <span>Start: {{ project.start_date }}</span>
+                <span>End: {{ project.end_date }}</span>
+                <span>Type: {{ project.project_type }}</span>
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>No projects found.</p>
+      {% endif %}
     </section>
     <section id="add-project">
       <h2>Add a New Project</h2>
-      <form id="add-project-form">
-        <input type="text" id="project-title" placeholder="Project Title" required>
-        <textarea id="project-description" placeholder="Project Description" required></textarea>
+      <form id="project-form" method="POST" action="{{ url_for('project_management') }}">
+        <div class="form-group">
+          <label for="title">Project Title:</label>
+          <input type="text" id="title" name="title" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="description">Description:</label>
+          <textarea id="description" name="description" required></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label for="start_date">Start Date:</label>
+          <input type="date" id="start_date" name="start_date" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="end_date">End Date:</label>
+          <input type="date" id="end_date" name="end_date" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="project_type">Project Type:</label>
+          <select id="project_type" name="project_type" required>
+            <option value="">Select Type</option>
+            <option value="research">Research</option>
+            <option value="development">Development</option>
+            <option value="analysis">Analysis</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="supervisor">Supervisor:</label>
+          <input type="text" id="supervisor" name="supervisor">
+        </div>
         
         <!-- Add participant search section -->
-        <div class="participant-search">
-          <label for="participant-search">Add Participants:</label>
+        <div class="form-group">
+          <label for="participant-search">Add Team Members:</label>
           <div class="search-container">
             <input type="text" 
                    id="participant-search" 
@@ -44,10 +92,20 @@
             <div id="search-results" class="dropdown-content"></div>
           </div>
           <div id="selected-participants" class="selected-list"></div>
-          <input type="hidden" id="participant-ids" name="participant_ids">
+          <input type="hidden" id="team_members" name="team_members">
         </div>
 
-        <button type="submit">Add Project</button>
+        <div class="form-group">
+          <label for="funding_source">Funding Source:</label>
+          <input type="text" id="funding_source" name="funding_source">
+        </div>
+
+        <div class="form-group">
+          <label for="budget">Budget:</label>
+          <input type="number" id="budget" name="budget" min="0" step="0.01">
+        </div>
+
+        <button type="submit" class="btn-primary">Create Project</button>
       </form>
     </section>
   </main>

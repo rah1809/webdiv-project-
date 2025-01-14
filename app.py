@@ -6,8 +6,10 @@ from datetime import datetime
 
 app = Flask(__name__,
             template_folder='templates',
-                static_folder='static')
+            static_folder='static')
 app.secret_key = os.urandom(24)  # Required for session management
+
+# Initialize database
 db = Database()
 
 @app.route('/')
@@ -17,27 +19,58 @@ def login():
         return redirect(url_for('dashboard'))
     return render_template('login.html')
 
+def db_required(f):
+    """Decorator to ensure database is connected"""
+    def wrapper(*args, **kwargs):
+        if not db.is_connected():
+            flash('Database is not connected. Please try again later.', 'error')
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    wrapper.__name__ = f.__name__
+    return wrapper
+
+@app.route('/login_post', methods=['GET', 'POST'])
+@db_required
+def login_post():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        
+        try:
+            if db.verify_user(username, password):
+                session['username'] = username
+                return redirect(url_for('dashboard'))
+            else:
+                flash('Invalid username or password')
+                return redirect(url_for('login'))
+        except Exception as e:
+            flash('Error during login. Please try again.')
+            return redirect(url_for('login'))
+    
+    return render_template('login.html')
+
+# Add the decorator to all routes that need database access
 @app.route('/dashboard')
+@db_required
 def dashboard():
-    print("dashboard")
     if 'username' not in session:
         return redirect(url_for('login'))
     
-    # Get user data from database
-    user_data = db.get_user_data(session['username'])
-    print("user_data", user_data)
-    # Get user's analyses
-    analyses = db.get_user_analyses(session['username'])
-    print("analyses", analyses)
-    # Get recent activities or other dashboard data
-    recent_activities = db.get_recent_activities(session['username'])
-    print("recent_activities", recent_activities)
-    
-    return render_template('dashboard.html',
-                         user_data=user_data,
-                         analyses=analyses,
-                         recent_activities=recent_activities)
-
+    try:
+        user_data = db.get_user_data(session['username'])
+        analyses = db.get_user_analyses(session['username'])
+        recent_activities = db.get_recent_activities(session['username'])
+        
+        return render_template('dashboard.html',
+                             user_data=user_data,
+                             analyses=analyses,
+                             recent_activities=recent_activities)
+    except Exception as e:
+        flash('Error loading dashboard data')
+        return render_template('dashboard.html',
+                             user_data={},
+                             analyses=[],
+                             recent_activities=[])
 
 @app.route('/collaboration.html')
 def collaboration():
@@ -191,21 +224,6 @@ def add_library_resource():
     
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)})
-
-@app.route('/login_post', methods=['GET', 'POST'])
-def login_post():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        
-        if db.verify_user(username, password):
-            session['username'] = username
-            return redirect(url_for('dashboard'))
-        else:
-            flash('Invalid username or password')
-            return redirect(url_for('login'))
-    
-    return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -664,5 +682,41 @@ def set_security_question():
     else:
         return jsonify({'success': False, 'message': 'Failed to set security question'})
 
+@app.route('/api/messages', methods=['GET', 'POST'])
+def handle_messages():
+    if 'username' not in session:
+        return jsonify({'error': 'Not logged in'}), 401
+
+    if request.method == 'GET':
+        try:
+            # Get the last 50 messages
+            messages = db.get_chat_messages(limit=50)
+            return jsonify(messages)
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+
+    elif request.method == 'POST':
+        try:
+            data = request.get_json()
+            message = {
+                'text': data.get('text'),
+                'username': session['username'],
+                'timestamp': datetime.utcnow()
+            }
+            
+            # Save the message
+            message_id = db.add_chat_message(message)
+            if message_id:
+                message['_id'] = str(message_id)
+                return jsonify(message), 201
+            else:
+                return jsonify({'error': 'Failed to save message'}), 500
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+
 if __name__ == '__main__':
+    if not db.is_connected():
+        print("\nWARNING: Database is not connected!")
+        print("The application will start, but functionality will be limited.")
+        print("Please ensure MongoDB is running and restart the application.\n")
     app.run(debug=True, use_reloader=False)
