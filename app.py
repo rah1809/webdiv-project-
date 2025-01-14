@@ -200,9 +200,17 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        email = request.form.get('email')  # Optional field
-        full_name = request.form.get('full_name')  # Optional field
+        email = request.form.get('email')
+        full_name = request.form.get('full_name')
+        security_question = request.form.get('security-question')
+        security_answer = request.form.get('security-answer')
         
+        # Validate required fields
+        if not all([username, password, email, security_question, security_answer]):
+            flash('All required fields must be filled out')
+            return redirect(url_for('register'))
+        
+        # Add user and get result
         success, message = db.add_user(
             username=username,
             password=password,
@@ -211,10 +219,12 @@ def register():
         )
         
         if success:
+            # Set security question
+            db.set_security_question(email, security_question, security_answer)
             flash('Registration successful! Please login.')
             return redirect(url_for('login'))
         else:
-            flash('Username already exists')
+            flash(message)
             return redirect(url_for('register'))
     
     return render_template('register.html')
@@ -581,6 +591,66 @@ def search_researchers():
     query = request.args.get('q', '')
     researchers = db.search_researchers(query)
     return jsonify(researchers)
+
+@app.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        question = request.form.get('security-question')
+        answer = request.form.get('security-answer')
+        
+        # Verify security answer
+        if db.verify_security_answer(email, answer):
+            # Generate reset token
+            token = db.create_reset_token(email)
+            
+            # In a real application, you would send this token via email
+            # For now, we'll redirect to the reset page directly
+            return redirect(url_for('reset_password', token=token))
+        else:
+            flash('Invalid email or security answer', 'error')
+            return redirect(url_for('forgot_password'))
+            
+    return render_template('forgot-password.html')
+
+@app.route('/reset-password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    if request.method == 'POST':
+        new_password = request.form.get('new_password')
+        confirm_password = request.form.get('confirm_password')
+        
+        if new_password != confirm_password:
+            flash('Passwords do not match', 'error')
+            return redirect(url_for('reset_password', token=token))
+            
+        if db.reset_password(token, new_password):
+            flash('Password reset successful', 'success')
+            return redirect(url_for('login'))
+        else:
+            flash('Invalid or expired reset token', 'error')
+            return redirect(url_for('forgot_password'))
+            
+    # Verify token is valid before showing reset form
+    email = db.verify_reset_token(token)
+    if not email:
+        flash('Invalid or expired reset token', 'error')
+        return redirect(url_for('forgot_password'))
+        
+    return render_template('reset-password.html', token=token)
+
+@app.route('/set-security-question', methods=['POST'])
+def set_security_question():
+    if 'user' not in session:
+        return jsonify({'success': False, 'message': 'Not logged in'})
+        
+    email = session['user']['email']
+    question = request.form.get('security-question')
+    answer = request.form.get('security-answer')
+    
+    if db.set_security_question(email, question, answer):
+        return jsonify({'success': True})
+    else:
+        return jsonify({'success': False, 'message': 'Failed to set security question'})
 
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=False)

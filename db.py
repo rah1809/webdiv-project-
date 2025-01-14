@@ -1,7 +1,9 @@
 from pymongo import MongoClient
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime
+from datetime import datetime, timedelta
 from bson.objectid import ObjectId
+import hashlib
+import secrets
 
 class Database:
     def __init__(self):
@@ -667,3 +669,82 @@ class Database:
         except Exception as e:
             print(f"Error searching researchers: {e}")
             return []
+
+    def set_security_question(self, email, question, answer):
+        """Store user's security question and hashed answer"""
+        # Hash the answer for security
+        answer_hash = hashlib.sha256(answer.encode()).hexdigest()
+        
+        self.db.users.update_one(
+            {'email': email},
+            {
+                '$set': {
+                    'security_question': question,
+                    'security_answer': answer_hash,
+                    'updated_at': datetime.utcnow()
+                }
+            }
+        )
+        return True
+
+    def verify_security_answer(self, email, answer):
+        """Verify user's security answer"""
+        user = self.db.users.find_one({'email': email})
+        if not user:
+            return False
+            
+        answer_hash = hashlib.sha256(answer.encode()).hexdigest()
+        return user.get('security_answer') == answer_hash
+
+    def create_reset_token(self, email):
+        """Create a password reset token valid for 1 hour"""
+        token = secrets.token_urlsafe(32)
+        expiry = datetime.utcnow() + timedelta(hours=1)
+        
+        self.db.password_resets.insert_one({
+            'email': email,
+            'token': token,
+            'expiry': expiry,
+            'used': False,
+            'created_at': datetime.utcnow()
+        })
+        
+        return token
+
+    def verify_reset_token(self, token):
+        """Verify if a reset token is valid and not expired"""
+        reset_doc = self.db.password_resets.find_one({
+            'token': token,
+            'used': False,
+            'expiry': {'$gt': datetime.utcnow()}
+        })
+        
+        return reset_doc['email'] if reset_doc else None
+
+    def reset_password(self, token, new_password):
+        """Reset user's password using a valid token"""
+        email = self.verify_reset_token(token)
+        if not email:
+            return False
+            
+        # Hash the new password
+        password_hash = hashlib.sha256(new_password.encode()).hexdigest()
+        
+        # Update password and mark token as used
+        self.db.users.update_one(
+            {'email': email},
+            {'$set': {'password': password_hash}}
+        )
+        
+        self.db.password_resets.update_one(
+            {'token': token},
+            {'$set': {'used': True}}
+        )
+        
+        return True
+
+    def cleanup_expired_tokens(self):
+        """Remove expired reset tokens"""
+        self.db.password_resets.delete_many({
+            'expiry': {'$lt': datetime.utcnow()}
+        })

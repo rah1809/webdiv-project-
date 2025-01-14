@@ -26,12 +26,28 @@
                 <input type="password" id="password" name="password" required>
             </div>
             <div class="form-group">
-                <label for="email">Email (optional):</label>
-                <input type="email" id="email" name="email">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+                <small class="form-help">Required for password recovery</small>
             </div>
             <div class="form-group">
                 <label for="full_name">Full Name (optional):</label>
                 <input type="text" id="full_name" name="full_name">
+            </div>
+            <div class="form-group">
+                <label for="security-question">Security Question:</label>
+                <select id="security-question" name="security-question" required>
+                    <option value="" disabled selected>Select your security question</option>
+                    <option value="pet">What was your first pet's name?</option>
+                    <option value="school">What was the name of your first school?</option>
+                    <option value="city">In which city were you born?</option>
+                    <option value="mother">What is your mother's maiden name?</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="security-answer">Security Answer:</label>
+                <input type="text" id="security-answer" name="security-answer" required>
+                <small class="form-help">Remember this answer for password recovery</small>
             </div>
             <button type="submit">Register</button>
         </form>
