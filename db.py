@@ -26,13 +26,14 @@ class Database:
                 'online_users': self.db['OnlineUsers'],
                 'library': self.db['Library'],
                 'projects': self.db['Projects'],
-                'chat_messages': self.db['ChatMessages']  # Add chat messages collection
+                'chat_messages': self.db['ChatMessages']
             }
             
             # Create direct references for commonly used collections
             self.login_collection = self.collections['login']
             self.user_profiles = self.collections['user_profiles']
             self.projects_collection = self.collections['projects']
+            self.data_analysis_collection = self.collections['data_analysis']
             
             print(f"Successfully connected to MongoDB. Database: {self.db.name}")
             
@@ -50,6 +51,7 @@ class Database:
             self.login_collection = None
             self.user_profiles = None
             self.projects_collection = None
+            self.data_analysis_collection = None
 
     def is_connected(self):
         """Check if database is connected"""
@@ -210,40 +212,62 @@ class Database:
 
     def add_analysis(self, username, title, description, data_type, file_path=None):
         """Add a new data analysis entry"""
-        analysis = {
-            'username': username,
-            'title': title,
-            'description': description,
-            'data_type': data_type,
-            'file_path': file_path,  # Add file path
-            'created_at': datetime.utcnow(),
-            'updated_at': datetime.utcnow(),
-            'status': 'pending'
-        }
-        
-        result = self.db['DataAnalysis'].insert_one(analysis)
-        return str(result.inserted_id)
+        try:
+            self.ensure_connected()
+            analysis = {
+                'username': username,
+                'title': title,
+                'description': description,
+                'data_type': data_type,
+                'file_path': file_path,
+                'created_at': datetime.utcnow(),
+                'updated_at': datetime.utcnow(),
+                'status': 'pending'
+            }
+            
+            result = self.data_analysis_collection.insert_one(analysis)
+            return str(result.inserted_id)
+        except Exception as e:
+            print(f"Error adding analysis: {e}")
+            return None
 
     def get_user_analyses(self, username):
         """Get all analyses for a user"""
-        return list(self.db['DataAnalysis'].find({'username': username}))
+        try:
+            self.ensure_connected()
+            return list(self.data_analysis_collection.find(
+                {'username': username}
+            ).sort('created_at', -1))
+        except Exception as e:
+            print(f"Error retrieving user analyses: {e}")
+            return []
 
     def update_analysis(self, analysis_id, update_data):
         """Update an analysis entry"""
-        update_data['updated_at'] = datetime.utcnow()
-        result = self.db['DataAnalysis'].update_one(
-            {'_id': ObjectId(analysis_id)},
-            {'$set': update_data}
-        )
-        return result.modified_count > 0
+        try:
+            self.ensure_connected()
+            update_data['updated_at'] = datetime.utcnow()
+            result = self.data_analysis_collection.update_one(
+                {'_id': ObjectId(analysis_id)},
+                {'$set': update_data}
+            )
+            return result.modified_count > 0
+        except Exception as e:
+            print(f"Error updating analysis: {e}")
+            return False
 
     def delete_analysis(self, analysis_id, username):
         """Delete an analysis entry"""
-        result = self.db['DataAnalysis'].delete_one({
-            '_id': ObjectId(analysis_id),
-            'username': username  # Ensure user owns the analysis
-        })
-        return result.deleted_count > 0
+        try:
+            self.ensure_connected()
+            result = self.data_analysis_collection.delete_one({
+                '_id': ObjectId(analysis_id),
+                'username': username  # Ensure user owns the analysis
+            })
+            return result.deleted_count > 0
+        except Exception as e:
+            print(f"Error deleting analysis: {e}")
+            return False
 
     def get_user_data(self, username):
         """Get user information from database"""

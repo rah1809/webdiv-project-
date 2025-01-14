@@ -264,33 +264,8 @@ def project_management():
     if 'username' not in session:
         return redirect(url_for('login'))
     
-    if request.method == 'POST':
-        project_data = {
-            'title': request.form.get('title'),
-            'description': request.form.get('description'),
-            'start_date': request.form.get('start_date'),
-            'end_date': request.form.get('end_date'),
-            'project_type': request.form.get('project_type'),
-            'supervisor': request.form.get('supervisor'),
-            'team_members': request.form.getlist('team_members'),
-            'funding_source': request.form.get('funding_source'),
-            'budget': request.form.get('budget'),
-            'objectives': request.form.getlist('objectives'),
-            'deliverables': request.form.getlist('deliverables'),
-            'created_by': session['username']
-        }
-        
-        project_id, message = db.create_project(project_data)
-        if project_id:
-            flash('Project created successfully!')
-        else:
-            flash('Error creating project: ' + message)
-        
-        return redirect(url_for('project_management'))
-    
-    # Get user's projects
-    projects = db.get_user_projects(session['username'])
-    return render_template('project-management.html', projects=projects)
+    # Simply render the under construction page
+    return render_template('project-management.html')
 
 @app.route('/project/<project_id>', methods=['GET'])
 def view_project(project_id):
